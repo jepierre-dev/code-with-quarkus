@@ -1,12 +1,15 @@
 package org.hexarch.application.usecases;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.hexarch.application.ports.in.AccountOperationUseCase;
 import org.hexarch.application.ports.out.AccountRepositoryPort;
-import org.hexarch.domain.exceptions.BusinessException;
+import org.hexarch.domain.exceptions.DuplicateResourceException;
+import org.hexarch.domain.exceptions.ErrorCode;
+import org.hexarch.domain.exceptions.ResourceNotFoundException;
 import org.hexarch.domain.model.Account;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -25,11 +28,18 @@ public class AccountOperationService implements AccountOperationUseCase {
     @Transactional
     public Account createAccount(String holderName, BigDecimal initialBalance, String email) {
         Account account = new Account(null, holderName, initialBalance, email);
-        Account existingAccount = accountRepositoryPort.findByHolderName(holderName);
-        if (existingAccount != null) {
-            throw new BusinessException("Account with holder name '" + holderName + "' already exists.");
+
+        if (accountRepositoryPort.existsByHolderName(holderName)) {
+            throw new DuplicateResourceException(ErrorCode.HOLDER_NAME_ALREADY_EXISTS,
+                    "Account with holder name already exists", Map.of("holderName", holderName));
         }
-        return accountRepositoryPort.save(account);
+
+        if(email != null && accountRepositoryPort.existsByEmail(email)) {
+            throw new DuplicateResourceException(ErrorCode.EMAIL_ALREADY_EXISTS,
+                    "Account with email already exists", Map.of("email", email));
+        }
+        
+        return accountRepositoryPort.create(account);
     }
 
     @Override
@@ -44,8 +54,12 @@ public class AccountOperationService implements AccountOperationUseCase {
 
         // Buscar cuentas de origen y destino
 
-        Account fromAccount = accountRepositoryPort.findById(fromAccountId).orElseThrow(() -> new BusinessException("From account not found"));
-        Account toAccount = accountRepositoryPort.findById(toAccountId).orElseThrow(() -> new BusinessException("To account not found"));
+        Account fromAccount = accountRepositoryPort.findById(fromAccountId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ACCOUNT_NOT_FOUND,
+                        "From account not found", Map.of("accountId", fromAccountId)));
+        Account toAccount = accountRepositoryPort.findById(toAccountId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ACCOUNT_NOT_FOUND,
+                        "To account not found", Map.of("accountId", toAccountId)));
     
         // Calcular nuevos balances
         Account updatedFromAccount = fromAccount.withDraw(amount);
@@ -53,8 +67,8 @@ public class AccountOperationService implements AccountOperationUseCase {
 
 
         // Actualizar cuentas en el repositorio
-        accountRepositoryPort.save(updatedFromAccount);
-        accountRepositoryPort.save(updatedToAccount);
+        accountRepositoryPort.update(updatedFromAccount);
+        accountRepositoryPort.update(updatedToAccount);
     }
     
 }

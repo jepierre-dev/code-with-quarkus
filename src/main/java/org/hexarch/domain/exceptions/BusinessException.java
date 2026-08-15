@@ -1,9 +1,14 @@
 package org.hexarch.domain.exceptions;
 
-public class BusinessException extends RuntimeException {
+import java.util.Map;
 
-    public BusinessException(String message) {
-        super(message);
+public class BusinessException extends DomainException {
+
+    public BusinessException(ErrorCode errorCode, String message) {
+        super(errorCode, message, Map.of());
     }
-    
+
+    public BusinessException(ErrorCode errorCode, String message, Map<String, Object> details) {
+        super(errorCode, message, details);
+    }
 }

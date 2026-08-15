@@ -30,4 +30,11 @@
                 <column name="email" type="VARCHAR(255)"/>
             </createTable>
         </changeSet>
+
+        <changeSet author="quarkus" id="3-accounts-email-unique">
+            <addUniqueConstraint tableName="accounts" columnNames="email" constraintName="uk_accounts_email"/>
+            <rollback>
+                <dropUniqueConstraint tableName="accounts" constraintName="uk_accounts_email"/>
+            </rollback>
+        </changeSet>
 </databaseChangeLog>

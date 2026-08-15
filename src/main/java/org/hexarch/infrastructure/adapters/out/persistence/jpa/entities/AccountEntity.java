@@ -12,7 +12,7 @@ import java.util.UUID;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 @Entity
-@Table(name = "accounts", uniqueConstraints = @UniqueConstraint(columnNames = {"holderName"}))
+@Table(name = "accounts", uniqueConstraints = {@UniqueConstraint(columnNames = {"holder_name"}), @UniqueConstraint(columnNames = {"email"})})
 public class AccountEntity extends PanacheEntityBase{
     @Id
     @GeneratedValue(generator = "UUID")
@@ -25,6 +25,6 @@ public class AccountEntity extends PanacheEntityBase{
     @Column(nullable = false, precision = 19, scale = 2)
     public BigDecimal balance;
 
-    @Column(nullable = true)
+    @Column(nullable = true, unique = true)
     public String email;
 }

@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.NotNull;
 
 public record TransferDto(
-    @NotNull UUID fromAccountId,
-    @NotNull UUID toAccountId,
-    @NotNull BigDecimal  amount
+    @NotNull(message = "From account ID must not be null") UUID fromAccountId,
+    @NotNull(message = "To account ID must not be null") UUID toAccountId,
+    @NotNull(message = "Amount must not be null") BigDecimal  amount
 ) {
     
 }
