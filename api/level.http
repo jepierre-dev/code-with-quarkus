@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@lang = es
+@accessToken =
+@levelId = 00000000-0000-0000-0000-000000000000
+
+# El contexto level solo tiene entidades por ahora.
+# Añadir aqui las peticiones al crear LevelController.
+
+### Placeholder: detalle de nivel
+# GET {{baseUrl}}/levels/{{levelId}}
+# Accept: {{contentType}}
+# Authorization: Bearer {{accessToken}}

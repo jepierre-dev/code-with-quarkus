@@ -1,0 +1,102 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@lang = es-CO
+
+### Registro
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "username": "hexi",
+  "email": "hexi@hexarch.org",
+  "password": "Passw0rd123"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "email": "hexi@hexarch.org",
+  "password": "Passw0rd123"
+}
+
+### Token capturado del ultimo login
+@accessToken = {{login.response.body.data.accessToken}}
+
+### Cambio de contrasena
+PATCH {{baseUrl}}/auth/password
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "currentPassword": "Passw0rd123",
+  "newPassword": "Passw0rd456"
+}
+
+### Deshacer el cambio para que el resto de peticiones sigan funcionando
+PATCH {{baseUrl}}/auth/password
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "currentPassword": "Passw0rd456",
+  "newPassword": "Passw0rd123"
+}
+
+### AUTH-003 contrasena debil
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "username": "weak",
+  "email": "weak@hexarch.org",
+  "password": "abc"
+}
+
+### USER-002 email o username ya registrado
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "username": "hexi",
+  "email": "hexi@hexarch.org",
+  "password": "Passw0rd123"
+}
+
+### AUTH-001 credenciales invalidas
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "email": "hexi@hexarch.org",
+  "password": "NoEsLaClave1"
+}
+
+### REQUEST-001 validacion del cuerpo
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "email": "no-es-un-email",
+  "password": ""
+}
+
+### 401 sin token
+PATCH {{baseUrl}}/auth/password
+Content-Type: {{contentType}}
+
+{
+  "currentPassword": "Passw0rd123",
+  "newPassword": "Passw0rd456"
+}

@@ -16,15 +16,12 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class JwtTokenProvider implements TokenProviderPort {
 
     private final String issuer;
-    private final String secret;
     private final long expirationSeconds;
 
     public JwtTokenProvider(
             @ConfigProperty(name = "hexarch.jwt.issuer") String issuer,
-            @ConfigProperty(name = "hexarch.jwt.secret") String secret,
             @ConfigProperty(name = "hexarch.jwt.expiration-seconds") long expirationSeconds) {
         this.issuer = issuer;
-        this.secret = secret;
         this.expirationSeconds = expirationSeconds;
     }
 
@@ -36,7 +33,7 @@ public class JwtTokenProvider implements TokenProviderPort {
                 .upn(email)
                 .groups(Set.of("user"))
                 .expiresAt(Instant.now().plusSeconds(expirationSeconds))
-                .signWithSecret(secret);
+                .sign();
 
         return AuthToken.bearer(token, expirationSeconds);
     }

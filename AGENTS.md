@@ -102,8 +102,9 @@ org.hexarch.shared
 ## Seguridad
 
 - Contraseñas con bcrypt (`BcryptUtil`), nunca en logs: `RawPassword` enmascara su `toString()`.
-- JWT HS256 firmado con `hexarch.jwt.secret`; el `sub` es el id del usuario, no el email.
-- El secreto de producción se inyecta con la variable de entorno `JWT_SECRET`.
+- JWT RS256 (algoritmo por defecto de MP-JWT); el `sub` es el id del usuario, no el email.
+- En dev/test Quarkus genera el par RSA en memoria porque no hay clave configurada. En `%prod` hay que apuntar `smallrye.jwt.sign.key.location` y `mp.jwt.verify.publickey.location` a los ficheros PEM.
+- No usar claves simétricas: Quarkus no cablea `smallrye.jwt.verify.secretkey`, así que HS256 sólo funciona con un JWK y no compensa.
 - Endpoints públicos con `@PermitAll`, el resto con `@Authenticated` o `@RolesAllowed`.
 
 ## Base de datos y Liquibase
@@ -119,6 +120,7 @@ org.hexarch.shared
 
 ## Reglas de trabajo
 
+- Las peticiones HTTP de prueba viven en `api/<contexto>.http`, un archivo por bounded context. Al añadir un endpoint se añade su petición ahí (incluyendo los casos de error).
 - No crear archivos Markdown de documentación salvo petición explícita.
 - Antes de dar por terminada una tarea: `./mvnw.cmd -q clean compile`.
 - Si cambia el esquema, actualizar entidad **y** changelog en el mismo cambio.

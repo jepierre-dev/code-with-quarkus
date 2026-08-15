@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@lang = es
+@accessToken =
+@userId = 00000000-0000-0000-0000-000000000000
+
+# El contexto user aun no expone adaptador REST: los casos de uso se consumen desde auth.
+# Añadir aqui las peticiones al crear UsersController.
+
+### Placeholder: baneo de usuario
+# PATCH {{baseUrl}}/users/{{userId}}/ban
+# Content-Type: {{contentType}}
+# Authorization: Bearer {{accessToken}}

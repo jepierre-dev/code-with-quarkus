@@ -1,10 +1,14 @@
 package org.hexarch.shared.infrastructure.rest;
 
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
@@ -20,8 +24,9 @@ public class ApiResponseFilter implements ContainerResponseFilter {
 
         ApiWraped apiWraped = resourceInfo.getResourceMethod().getAnnotation(ApiWraped.class);
 
-        String message = apiWraped.message();
         boolean includeStatus = apiWraped.includeStatus();
+        ResourceBundle bundle = Messages.bundleFor(Messages.MESSAGES, requestContext.getAcceptableLanguages());
+        String message = Messages.resolve(bundle, apiWraped.message(), Map.of());
 
         Object body = responseContext.getEntity();
 
@@ -31,5 +36,6 @@ public class ApiResponseFilter implements ContainerResponseFilter {
             message
         );
         responseContext.setEntity(apiResponse);
+        responseContext.getHeaders().putSingle(HttpHeaders.CONTENT_LANGUAGE, Messages.languageTagOf(bundle));
     }
 }

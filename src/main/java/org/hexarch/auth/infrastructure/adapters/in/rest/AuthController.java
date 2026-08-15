@@ -39,7 +39,7 @@ public class AuthController {
     @POST
     @Path("/register")
     @PermitAll
-    @ApiWraped(message = "User registered successfully.")
+    @ApiWraped(message = "auth.register.success")
     public AuthTokenDto register(@Valid RegisterDto request) {
         return AuthTokenDto.from(authUseCase.register(request.username(), request.email(), request.password()));
     }
@@ -47,7 +47,7 @@ public class AuthController {
     @POST
     @Path("/login")
     @PermitAll
-    @ApiWraped(message = "Login successful.")
+    @ApiWraped(message = "auth.login.success")
     public AuthTokenDto login(@Valid LoginDto request) {
         return AuthTokenDto.from(authUseCase.login(request.email(), request.password()));
     }

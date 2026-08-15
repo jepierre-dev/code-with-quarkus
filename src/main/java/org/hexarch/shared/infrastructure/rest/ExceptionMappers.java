@@ -57,14 +57,14 @@ public class ExceptionMappers {
 
     private static RestResponse<ApiResponse<Void>> error(int status, String code, Map<String, Object> details,
             UriInfo uriInfo, HttpHeaders headers) {
-        ResourceBundle bundle = ErrorMessages.bundleFor(headers);
-        String message = ErrorMessages.resolve(bundle, code, details);
+        ResourceBundle bundle = Messages.bundleFor(Messages.ERRORS, headers.getAcceptableLanguages());
+        String message = Messages.resolve(bundle, code, details);
         ApiError apiError = new ApiError(code, message, details, Instant.now(), uriInfo.getPath());
 
         return RestResponse.ResponseBuilder.<ApiResponse<Void>>create(status)
                 .entity(new ApiResponse<>(status, null, message, apiError))
                 .type(MediaType.APPLICATION_JSON_TYPE)
-                .header(HttpHeaders.CONTENT_LANGUAGE, ErrorMessages.languageTagOf(bundle))
+                .header(HttpHeaders.CONTENT_LANGUAGE, Messages.languageTagOf(bundle))
                 .build();
     }
 
