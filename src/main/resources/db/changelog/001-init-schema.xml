@@ -1,0 +1,244 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Las etiquetas van en mayuscula porque Hibernate mapea el enum por el nombre de la constante Java. -->
+    <changeSet author="hexarch" id="001-1-create-enum-types">
+        <sql>
+            CREATE TYPE level_status AS ENUM ('DRAFT', 'PUBLISHED', 'UNLISTED', 'DELETED');
+            CREATE TYPE level_role AS ENUM ('OWNER', 'BUILDER', 'DECORATOR', 'VERIFIER', 'VIEWER');
+            CREATE TYPE level_action AS ENUM ('CREATED', 'MEMBER_ADDED', 'MEMBER_REMOVED', 'ROLE_CHANGED', 'VERSION_CREATED', 'PUBLISHED', 'UNPUBLISHED');
+        </sql>
+        <rollback>
+            <sql>
+                DROP TYPE IF EXISTS level_action;
+                DROP TYPE IF EXISTS level_role;
+                DROP TYPE IF EXISTS level_status;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-2-create-users">
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_users" nullable="false"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="TEXT">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_users_email"/>
+            </column>
+            <column name="is_banned" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-3-create-user-credential">
+        <createTable tableName="user_credential">
+            <column name="user_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_user_credential" nullable="false"
+                    foreignKeyName="fk_user_credential_user_id" references="users(id)"/>
+            </column>
+            <column name="pass_hash" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-4-create-player-stats">
+        <createTable tableName="player_stats">
+            <column name="user_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_player_stats" nullable="false"
+                    foreignKeyName="fk_player_stats_user_id" references="users(id)"/>
+            </column>
+            <column name="stars" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="diamonds" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_coins" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="demons_completed" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="levels_completed" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creator_points" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-5-create-difficulties">
+        <createTable tableName="difficulties">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_difficulties" nullable="false"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stars" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- current_version se queda sin FK aqui: level_versions aun no existe (dependencia circular). -->
+    <changeSet author="hexarch" id="001-6-create-levels">
+        <createTable tableName="levels">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_levels" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="song_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="difficulty_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_levels_difficulty_id" references="difficulties(id)"/>
+            </column>
+            <column name="status" type="level_status" defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="downloads" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="likes" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="plays" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_at" type="TIMESTAMP"/>
+            <column name="length" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_version" type="UUID"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-7-create-level-versions">
+        <createTable tableName="level_versions">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_level_versions" nullable="false"/>
+            </column>
+            <column name="level_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_level_versions_level_id" references="levels(id)"
+                    deleteCascade="true"/>
+            </column>
+            <column name="version_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_level_versions_created_by" references="users(id)"/>
+            </column>
+            <column name="level_data" type="BYTEA">
+                <constraints nullable="false"/>
+            </column>
+            <column name="checksum" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changelog" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="level_versions" columnNames="level_id, version_number"
+            constraintName="uk_level_versions_level_id_version_number"/>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-8-levels-current-version-fk">
+        <addForeignKeyConstraint baseTableName="levels" baseColumnNames="current_version"
+            referencedTableName="level_versions" referencedColumnNames="id"
+            constraintName="fk_levels_current_version" onDelete="SET NULL"/>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-9-create-level-members">
+        <createTable tableName="level_members">
+            <column name="level_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_level_members_level_id" references="levels(id)"
+                    deleteCascade="true"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_level_members_user_id" references="users(id)"
+                    deleteCascade="true"/>
+            </column>
+            <column name="role" type="level_role">
+                <constraints nullable="false"/>
+            </column>
+            <column name="joined_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="invited_by" type="UUID">
+                <constraints foreignKeyName="fk_level_members_invited_by" references="users(id)"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="level_members" columnNames="level_id, user_id" constraintName="pk_level_members"/>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-10-create-level-history">
+        <createTable tableName="level_history">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_level_history" nullable="false"/>
+            </column>
+            <column name="level_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_level_history_level_id" references="levels(id)"
+                    deleteCascade="true"/>
+            </column>
+            <column name="actor_id" type="UUID">
+                <constraints foreignKeyName="fk_level_history_actor_id" references="users(id)"/>
+            </column>
+            <column name="action" type="level_action">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_user_id" type="UUID">
+                <constraints foreignKeyName="fk_level_history_target_user_id" references="users(id)"/>
+            </column>
+            <column name="version_id" type="UUID">
+                <constraints foreignKeyName="fk_level_history_version_id" references="level_versions(id)"/>
+            </column>
+            <column name="metadata" type="JSONB"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="hexarch" id="001-11-create-indexes">
+        <createIndex tableName="levels" indexName="idx_levels_difficulty_id">
+            <column name="difficulty_id"/>
+        </createIndex>
+        <createIndex tableName="levels" indexName="idx_levels_status">
+            <column name="status"/>
+        </createIndex>
+        <createIndex tableName="level_versions" indexName="idx_level_versions_level_id">
+            <column name="level_id"/>
+        </createIndex>
+        <createIndex tableName="level_members" indexName="idx_level_members_user_id">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex tableName="level_history" indexName="idx_level_history_level_id_created_at">
+            <column name="level_id"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
