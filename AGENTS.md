@@ -105,7 +105,30 @@ org.hexarch.shared
 - JWT RS256 (algoritmo por defecto de MP-JWT); el `sub` es el id del usuario, no el email.
 - En dev/test Quarkus genera el par RSA en memoria porque no hay clave configurada. En `%prod` hay que apuntar `smallrye.jwt.sign.key.location` y `mp.jwt.verify.publickey.location` a los ficheros PEM.
 - No usar claves simétricas: Quarkus no cablea `smallrye.jwt.verify.secretkey`, así que HS256 sólo funciona con un JWK y no compensa.
-- Endpoints públicos con `@PermitAll`, el resto con `@Authenticated` o `@RolesAllowed`.
+- Endpoints públicos con `@PermitAll`, el resto con `@Authenticated` o `@RequirePermission`.
+
+## Autorización
+
+Dos ejes **ortogonales**. No mezclarlos ni meterlos en el mismo enum.
+
+**1. Plataforma (global).** Depende sólo de quién eres.
+
+- `shared.domain.security.PlatformRole` (`PLAYER`, `MODERATOR`, `ADMIN`) → `Set<PlatformPermission>`. El mapeo vive en código, no en BD.
+- El rol se guarda en `users.role` (enum PG `user_role`) y se emite en el claim `groups` del JWT.
+- En el endpoint: `@RequirePermission(PlatformPermission.USER_BAN)`. Implica autenticación (401 sin token, 403 sin permiso con `AUTHZ-001`).
+- Vive en `shared` porque los permisos cruzan contextos (`LEVEL_APPROVE` lo consume `level`, `USER_BAN` lo consume `user`); ponerlo en un contexto obligaría a que otro lo importara.
+- **Consecuencia del claim**: un cambio de rol o un baneo no surte efecto hasta que expira el token (1 h). Para operaciones críticas, revalidar contra BD en el caso de uso.
+
+**2. Recurso (por nivel).** Depende de quién eres **y** de qué nivel: no se puede resolver sólo con el JWT, hay que ir a `level_members`. Se resolverá con `@RequireLevelPermission` + un parámetro `@LevelId` cuando el contexto `level` tenga endpoints.
+
+La anotación es la **primera barrera** del adaptador `in`. Si la regla es de negocio, reafirmarla en el caso de uso a través de un puerto, para que no se escape desde otro adaptador.
+
+## i18n
+
+- Dos bundles: `errors.properties` (códigos de error) y `messages.properties` (mensajes de éxito), ambos con su `_es`.
+- El texto se resuelve en el borde REST según `Accept-Language`; el helper es `shared.infrastructure.rest.Messages`.
+- `@ApiWraped(message = "auth.login.success")` recibe una **clave**, no un literal. Si la clave no está traducida se devuelve tal cual.
+- `ApiResponseFilter` no envuelve respuestas que no sean 2xx: los errores ya vienen con su forma final de `ExceptionMappers`.
 
 ## Base de datos y Liquibase
 
