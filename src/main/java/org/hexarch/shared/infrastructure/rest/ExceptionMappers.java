@@ -73,6 +73,7 @@ public class ExceptionMappers {
         return switch (exception) {
             case DomainException.NotFound e -> Response.Status.NOT_FOUND.getStatusCode();
             case DomainException.Conflict e -> Response.Status.CONFLICT.getStatusCode();
+            case DomainException.Forbidden e -> Response.Status.FORBIDDEN.getStatusCode();
             case DomainException.RuleViolation e -> UNPROCESSABLE_ENTITY;
         };
     }

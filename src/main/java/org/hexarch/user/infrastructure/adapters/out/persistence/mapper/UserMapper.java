@@ -14,10 +14,11 @@ public final class UserMapper {
         entity.name = user.username();
         entity.email = user.email();
         entity.banned = user.banned();
+        entity.role = user.role();
         return entity;
     }
 
     public static UserModel toDomain(UserEntity entity) {
-        return new UserModel(entity.id, entity.name, entity.email, entity.banned);
+        return new UserModel(entity.id, entity.name, entity.email, entity.banned, entity.role);
     }
 }

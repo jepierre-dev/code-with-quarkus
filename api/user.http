@@ -1,13 +1,54 @@
 @baseUrl = http://localhost:8080
 @contentType = application/json
 @lang = es
-@accessToken =
-@userId = 00000000-0000-0000-0000-000000000000
+@targetUserId = 00000000-0000-0000-0000-000000000000
 
-# El contexto user aun no expone adaptador REST: los casos de uso se consumen desde auth.
-# Añadir aqui las peticiones al crear UsersController.
+### Login (el token lleva el rol en el claim groups)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
 
-### Placeholder: baneo de usuario
-# PATCH {{baseUrl}}/users/{{userId}}/ban
-# Content-Type: {{contentType}}
-# Authorization: Bearer {{accessToken}}
+{
+  "email": "hexi@hexarch.org",
+  "password": "Passw0rd123"
+}
+
+@accessToken = {{login.response.body.data.accessToken}}
+
+### Detalle de usuario (solo requiere estar autenticado)
+GET {{baseUrl}}/users/{{targetUserId}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Banear - requiere USER_BAN (MODERATOR o ADMIN)
+PATCH {{baseUrl}}/users/{{targetUserId}}/ban
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Desbanear - requiere USER_BAN
+PATCH {{baseUrl}}/users/{{targetUserId}}/unban
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Cambiar rol - requiere USER_ROLE_ASSIGN (solo ADMIN)
+PATCH {{baseUrl}}/users/{{targetUserId}}/role
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "role": "MODERATOR"
+}
+
+### AUTHZ-001 sin permiso: repetir el ban con un token de PLAYER
+PATCH {{baseUrl}}/users/{{targetUserId}}/ban
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### 401 sin token
+PATCH {{baseUrl}}/users/{{targetUserId}}/ban
+Content-Type: {{contentType}}

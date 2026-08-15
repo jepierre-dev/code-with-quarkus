@@ -3,6 +3,7 @@ package org.hexarch.user.infrastructure.adapters.out.persistence.repository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hexarch.shared.domain.security.PlatformRole;
 import org.hexarch.user.application.port.out.UserRepositoryPort;
 import org.hexarch.user.domain.exceptions.UserErrors;
 import org.hexarch.user.domain.model.UserModel;
@@ -39,11 +40,24 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     // Muta la instancia gestionada: Hibernate emite el UPDATE por dirty checking al hacer flush.
     @Override
-    public void setBanned(UUID userId, boolean banned) {
+    public UserModel setBanned(UUID userId, boolean banned) {
+        UserEntity managed = requireById(userId);
+        managed.banned = banned;
+        return UserMapper.toDomain(managed);
+    }
+
+    @Override
+    public UserModel setRole(UUID userId, PlatformRole role) {
+        UserEntity managed = requireById(userId);
+        managed.role = role;
+        return UserMapper.toDomain(managed);
+    }
+
+    private static UserEntity requireById(UUID userId) {
         UserEntity managed = UserEntity.findById(userId);
         if (managed == null) {
             throw UserErrors.userNotFound(userId);
         }
-        managed.banned = banned;
+        return managed;
     }
 }

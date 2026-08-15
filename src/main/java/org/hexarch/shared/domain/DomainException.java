@@ -58,4 +58,16 @@ public abstract sealed class DomainException extends RuntimeException {
             super(errorCode, details);
         }
     }
+
+    /** El llamante esta autenticado pero no tiene permiso sobre la operacion. */
+    public static final class Forbidden extends DomainException {
+
+        public Forbidden(ErrorCode errorCode) {
+            this(errorCode, Map.of());
+        }
+
+        public Forbidden(ErrorCode errorCode, Map<String, Object> details) {
+            super(errorCode, details);
+        }
+    }
 }

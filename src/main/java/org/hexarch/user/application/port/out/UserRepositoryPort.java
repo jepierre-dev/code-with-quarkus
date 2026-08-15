@@ -3,6 +3,7 @@ package org.hexarch.user.application.port.out;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hexarch.shared.domain.security.PlatformRole;
 import org.hexarch.user.domain.model.UserModel;
 
 public interface UserRepositoryPort {
@@ -15,5 +16,7 @@ public interface UserRepositoryPort {
 
     boolean existsByUsernameOrEmail(String username, String email);
 
-    void setBanned(UUID userId, boolean banned);
+    UserModel setBanned(UUID userId, boolean banned);
+
+    UserModel setRole(UUID userId, PlatformRole role);
 }

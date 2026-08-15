@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.hexarch.auth.application.port.out.TokenProviderPort;
 import org.hexarch.auth.domain.model.AuthToken;
+import org.hexarch.shared.domain.security.PlatformRole;
 
 import io.smallrye.jwt.build.Jwt;
 
@@ -27,11 +28,11 @@ public class JwtTokenProvider implements TokenProviderPort {
 
     // El subject es el id del usuario: el email puede cambiar y no sirve como identidad estable.
     @Override
-    public AuthToken issue(UUID userId, String email) {
+    public AuthToken issue(UUID userId, String email, PlatformRole role) {
         String token = Jwt.issuer(issuer)
                 .subject(userId.toString())
                 .upn(email)
-                .groups(Set.of("user"))
+                .groups(Set.of(role.name()))
                 .expiresAt(Instant.now().plusSeconds(expirationSeconds))
                 .sign();
 

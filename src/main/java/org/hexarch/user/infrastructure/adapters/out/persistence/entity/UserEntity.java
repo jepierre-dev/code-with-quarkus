@@ -2,10 +2,16 @@ package org.hexarch.user.infrastructure.adapters.out.persistence.entity;
 
 import java.util.UUID;
 
+import org.hexarch.shared.domain.security.PlatformRole;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,4 +35,9 @@ public class UserEntity extends PanacheEntityBase {
 
     @Column(name = "is_banned", nullable = false)
     public boolean banned = false;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(nullable = false, columnDefinition = "user_role")
+    public PlatformRole role = PlatformRole.PLAYER;
 }

@@ -3,6 +3,7 @@ package org.hexarch.user.application.port.in;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hexarch.shared.domain.security.PlatformRole;
 import org.hexarch.user.domain.model.UserModel;
 
 // Sin contrasenas: las credenciales son responsabilidad del contexto auth.
@@ -14,7 +15,9 @@ public interface UsersUseCase {
 
     Optional<UserModel> findByEmail(String email);
 
-    void banUser(UUID userId);
+    UserModel banUser(UUID userId);
 
-    void unbanUser(UUID userId);
+    UserModel unbanUser(UUID userId);
+
+    UserModel changeRole(UUID userId, PlatformRole role);
 }

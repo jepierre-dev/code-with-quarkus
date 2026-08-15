@@ -39,7 +39,7 @@ public class AuthService implements AuthUseCase {
 
         UserModel user = usersUseCase.createUser(username, email);
         credentialRepository.save(user.id(), passHash);
-        return tokenProvider.issue(user.id(), user.email());
+        return tokenProvider.issue(user.id(), user.email(), user.role());
     }
 
     @Override
@@ -55,7 +55,7 @@ public class AuthService implements AuthUseCase {
         if (user.banned()) {
             throw AuthErrors.accountBanned();
         }
-        return tokenProvider.issue(user.id(), user.email());
+        return tokenProvider.issue(user.id(), user.email(), user.role());
     }
 
     @Override

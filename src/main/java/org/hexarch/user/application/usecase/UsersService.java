@@ -3,6 +3,7 @@ package org.hexarch.user.application.usecase;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hexarch.shared.domain.security.PlatformRole;
 import org.hexarch.user.application.port.in.UsersUseCase;
 import org.hexarch.user.application.port.out.UserRepositoryPort;
 import org.hexarch.user.domain.exceptions.UserErrors;
@@ -41,13 +42,19 @@ public class UsersService implements UsersUseCase {
 
     @Override
     @Transactional
-    public void banUser(UUID userId) {
-        userRepository.setBanned(userId, true);
+    public UserModel banUser(UUID userId) {
+        return userRepository.setBanned(userId, true);
     }
 
     @Override
     @Transactional
-    public void unbanUser(UUID userId) {
-        userRepository.setBanned(userId, false);
+    public UserModel unbanUser(UUID userId) {
+        return userRepository.setBanned(userId, false);
+    }
+
+    @Override
+    @Transactional
+    public UserModel changeRole(UUID userId, PlatformRole role) {
+        return userRepository.setRole(userId, role);
     }
 }

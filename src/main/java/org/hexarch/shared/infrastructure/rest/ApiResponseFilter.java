@@ -9,6 +9,7 @@ import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response.Status.Family;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
@@ -21,6 +22,11 @@ public class ApiResponseFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
+
+        // Los errores ya vienen con su forma final desde ExceptionMappers: envolverlos otra vez los anidaria.
+        if (responseContext.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+            return;
+        }
 
         ApiWraped apiWraped = resourceInfo.getResourceMethod().getAnnotation(ApiWraped.class);
 
