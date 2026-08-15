@@ -127,7 +127,8 @@ La anotación es la **primera barrera** del adaptador `in`. Si la regla es de ne
 
 - **Público** (`@PermitAll`), **autenticado** (`@Authenticated` / `@RequirePermission`) y **autenticación opcional**: endpoints públicos que enriquecen la respuesta si viene un token.
 - Los casos de uso reciben `shared.domain.security.Caller` como **primer parámetro**, nunca `JsonWebToken`. `Caller` nunca es null: un visitante anónimo es `Caller.ANONYMOUS`.
-- El único `if (token != null)` vive en el productor CDI del adaptador `in`. Nada de duplicar endpoints en `/me/...`.
+- El único `if (token != null)` vive en `CallerResolver`, que los controllers invocan con `callerResolver.current()`. Nada de duplicar endpoints en `/me/...`.
+- `Caller` no se inyecta: es un `record` y CDI no puede proxiar clases finales, así que un bean `@RequestScoped` fallaría al arrancar.
 - Un token inválido o caducado devuelve 401 aunque el endpoint sea `@PermitAll`. Es lo correcto; no desactivar la autenticación proactiva para tragárselo.
 - Sobre recursos ajenos no visibles se devuelve **404, no 403**: un 403 confirmaría que ese id existe.
 
