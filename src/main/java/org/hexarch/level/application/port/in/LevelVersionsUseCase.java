@@ -9,8 +9,8 @@ import org.hexarch.shared.domain.security.Caller;
 
 public interface LevelVersionsUseCase {
 
-    /** El numero de version, el checksum y la longitud los calcula el caso de uso, no el cliente. */
-    LevelVersionModel upload(Caller caller, UUID levelId, byte[] levelData, String changelog);
+    /** El numero de version y el checksum los calcula el caso de uso; la longitud la reporta el editor. */
+    LevelVersionModel upload(Caller caller, UUID levelId, byte[] levelData, String changelog, short length);
 
     List<LevelVersionModel> history(Caller caller, UUID levelId);
 

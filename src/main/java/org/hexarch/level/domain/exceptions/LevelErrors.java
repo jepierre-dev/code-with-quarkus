@@ -3,6 +3,7 @@ package org.hexarch.level.domain.exceptions;
 import java.util.Map;
 import java.util.UUID;
 
+import org.hexarch.level.domain.enums.LevelPermission;
 import org.hexarch.shared.domain.DomainException;
 
 public final class LevelErrors {
@@ -47,5 +48,23 @@ public final class LevelErrors {
     public static DomainException publishRequiresDate(UUID levelId) {
         return new DomainException.RuleViolation(LevelErrorCode.PUBLISH_REQUIRES_DATE,
                 Map.of("levelId", levelId));
+    }
+
+    public static DomainException levelPermissionDenied(LevelPermission permission) {
+        return new DomainException.Forbidden(LevelErrorCode.LEVEL_PERMISSION_DENIED,
+                Map.of("permission", permission.name()));
+    }
+
+    public static DomainException memberAlreadyExists(UUID levelId, UUID userId) {
+        return new DomainException.Conflict(LevelErrorCode.MEMBER_ALREADY_EXISTS,
+                Map.of("levelId", levelId, "userId", userId));
+    }
+
+    public static DomainException ownerImmutable(UUID levelId) {
+        return new DomainException.RuleViolation(LevelErrorCode.OWNER_IMMUTABLE, Map.of("levelId", levelId));
+    }
+
+    public static DomainException emptyLevelData() {
+        return new DomainException.RuleViolation(LevelErrorCode.EMPTY_LEVEL_DATA);
     }
 }

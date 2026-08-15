@@ -19,7 +19,5 @@ public interface LevelRepositoryPort {
     /** Devuelve resumenes, no agregados: un listado no debe cargar el nivel entero por fila. */
     Page<LevelSummary> search(LevelSearchCriteria criteria);
 
-    void delete(UUID levelId);
-
     boolean existsById(UUID levelId);
 }

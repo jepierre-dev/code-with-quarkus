@@ -71,6 +71,12 @@ public record LevelModel(
                 createdAt, publishedAt, currentVersionId);
     }
 
+    /** Borrado logico: hay versiones, miembros e historial colgando de este id. */
+    public LevelModel markDeleted() {
+        return new LevelModel(id, name, description, songId, difficultyId, LevelStatus.DELETED, length,
+                createdAt, publishedAt, currentVersionId);
+    }
+
     /** Calificar es cosa de moderacion y es independiente de publicar. */
     public LevelModel rate(UUID difficultyId) {
         Objects.requireNonNull(difficultyId, "difficultyId must not be null");
