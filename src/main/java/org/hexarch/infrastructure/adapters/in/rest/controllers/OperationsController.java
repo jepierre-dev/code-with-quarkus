@@ -36,7 +36,7 @@ public class OperationsController {
     @POST
     @Path("/create-account")
     public String createAccount(@Valid CreateAccountDto createAccountRequest) {
-        accountOperationUseCase.createAccount(createAccountRequest.holderName(), createAccountRequest.initialBalance());
+        accountOperationUseCase.createAccount(createAccountRequest.holderName(), createAccountRequest.initialBalance(), createAccountRequest.email());
         return "Account created successfully.";
     }
 }

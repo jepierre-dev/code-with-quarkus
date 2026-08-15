@@ -23,8 +23,8 @@ public class AccountOperationService implements AccountOperationUseCase {
 
     @Override
     @Transactional
-    public Account createAccount(String holderName, BigDecimal initialBalance) {
-        Account account = new Account(null, holderName, initialBalance);
+    public Account createAccount(String holderName, BigDecimal initialBalance, String email) {
+        Account account = new Account(null, holderName, initialBalance, email);
         Account existingAccount = accountRepositoryPort.findByHolderName(holderName);
         if (existingAccount != null) {
             throw new BusinessException("Account with holder name '" + holderName + "' already exists.");

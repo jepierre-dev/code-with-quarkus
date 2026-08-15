@@ -10,11 +10,12 @@ public class AccountMapper {
         entity.id = account.id();
         entity.holderName = account.holderName();
         entity.balance = account.balance();
+        entity.email = account.email();
         return entity;
     }
 
     public static Account toDomain(AccountEntity entity) {
-        return new Account(entity.id, entity.holderName, entity.balance);
+        return new Account(entity.id, entity.holderName, entity.balance, entity.email);
     }
     
 }

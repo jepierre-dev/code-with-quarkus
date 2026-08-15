@@ -8,7 +8,7 @@ import org.hexarch.domain.model.Account;
 
 public interface AccountOperationUseCase {
 
-    public Account createAccount(String holderName, BigDecimal initialBalance);
+    public Account createAccount(String holderName, BigDecimal initialBalance, String email);
 
     public Optional<Account> getAccount(UUID accountId);
 
