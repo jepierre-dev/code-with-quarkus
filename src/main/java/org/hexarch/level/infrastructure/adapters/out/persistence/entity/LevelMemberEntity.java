@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.hexarch.level.domain.enums.LevelRole;
-import org.hexarch.user.infrastructure.adapters.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -38,11 +37,6 @@ public class LevelMemberEntity extends PanacheEntityBase {
     @JoinColumn(name = "level_id", foreignKey = @ForeignKey(name = "fk_level_members_level_id"))
     public LevelEntity level;
 
-    @MapsId("userId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_level_members_user_id"))
-    public UserEntity user;
-
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "level_role")
@@ -52,9 +46,8 @@ public class LevelMemberEntity extends PanacheEntityBase {
     @Column(name = "joined_at", nullable = false, updatable = false)
     public LocalDateTime joinedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "invited_by", foreignKey = @ForeignKey(name = "fk_level_members_invited_by"))
-    public UserEntity invitedBy;
+    @Column(name = "invited_by")
+    public UUID invitedBy;
 
     @Embeddable
     public static class LevelMemberId implements Serializable {

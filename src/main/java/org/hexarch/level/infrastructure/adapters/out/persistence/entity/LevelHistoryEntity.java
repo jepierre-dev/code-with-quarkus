@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hexarch.level.domain.enums.LevelAction;
-import org.hexarch.user.infrastructure.adapters.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -38,18 +37,16 @@ public class LevelHistoryEntity extends PanacheEntityBase {
     public LevelEntity level;
 
     // Nulo cuando la accion la ejecuta el sistema y no un usuario.
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "actor_id", foreignKey = @ForeignKey(name = "fk_level_history_actor_id"))
-    public UserEntity actor;
+    @Column(name = "actor_id")
+    public UUID actorId;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "level_action")
     public LevelAction action;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_user_id", foreignKey = @ForeignKey(name = "fk_level_history_target_user_id"))
-    public UserEntity targetUser;
+    @Column(name = "target_user_id")
+    public UUID targetUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "version_id", foreignKey = @ForeignKey(name = "fk_level_history_version_id"))

@@ -3,7 +3,6 @@ package org.hexarch.level.infrastructure.adapters.out.persistence.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.hexarch.user.infrastructure.adapters.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
@@ -38,9 +37,8 @@ public class LevelVersionEntity extends PanacheEntityBase {
     @Column(name = "version_number", nullable = false)
     public int versionNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "created_by", nullable = false, foreignKey = @ForeignKey(name = "fk_level_versions_created_by"))
-    public UserEntity createdBy;
+    @Column(name = "created_by", nullable = false)
+    public UUID createdBy;
 
     // Sin @Lob: en PostgreSQL eso lo mapearia a OID en vez de bytea.
     @Column(name = "level_data", nullable = false, columnDefinition = "bytea")

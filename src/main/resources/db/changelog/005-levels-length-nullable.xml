@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- La longitud sale del level_data: un borrador sin ninguna version todavia no la conoce. -->
+    <changeSet author="hexarch" id="005-1-levels-length-nullable">
+        <dropNotNullConstraint tableName="levels" columnName="length" columnDataType="SMALLINT"/>
+        <rollback>
+            <addNotNullConstraint tableName="levels" columnName="length" columnDataType="SMALLINT"
+                defaultNullValue="0"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,59 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Los contadores salen de levels: escriben miles de veces mas que el nivel y ensuciarian updated_at. -->
+    <changeSet author="hexarch" id="004-1-create-level-stats">
+        <createTable tableName="level_stats">
+            <column name="level_id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_level_stats" nullable="false"
+                    foreignKeyName="fk_level_stats_level_id" references="levels(id)" deleteCascade="true"/>
+            </column>
+            <column name="downloads" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="likes" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="plays" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <sql>
+            INSERT INTO level_stats (level_id, downloads, likes, plays)
+            SELECT id, downloads, likes, plays FROM levels;
+        </sql>
+    </changeSet>
+
+    <changeSet author="hexarch" id="004-2-drop-level-counters">
+        <dropColumn tableName="levels">
+            <column name="downloads"/>
+            <column name="likes"/>
+            <column name="plays"/>
+        </dropColumn>
+    </changeSet>
+
+    <!-- El like es un hecho por usuario: la PK compuesta impide el doble like y responde "ya le di like". -->
+    <changeSet author="hexarch" id="004-3-create-level-likes">
+        <createTable tableName="level_likes">
+            <column name="level_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_level_likes_level_id" references="levels(id)"
+                    deleteCascade="true"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_level_likes_user_id" references="users(id)"
+                    deleteCascade="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="level_likes" columnNames="level_id, user_id" constraintName="pk_level_likes"/>
+        <createIndex tableName="level_likes" indexName="idx_level_likes_user_id">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

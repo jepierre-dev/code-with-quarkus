@@ -44,23 +44,15 @@ public class LevelEntity extends PanacheEntityBase {
     @Column(name = "song_id", nullable = false)
     public UUID songId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "difficulty_id", nullable = false, foreignKey = @ForeignKey(name = "fk_levels_difficulty_id"))
+    // Nula hasta que un moderador califica el nivel: publicado no implica calificado.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "difficulty_id", foreignKey = @ForeignKey(name = "fk_levels_difficulty_id"))
     public DifficultyEntity difficulty;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(nullable = false, columnDefinition = "level_status")
     public LevelStatus status = LevelStatus.DRAFT;
-
-    @Column(nullable = false)
-    public long downloads = 0;
-
-    @Column(nullable = false)
-    public long likes = 0;
-
-    @Column(nullable = false)
-    public long plays = 0;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -73,8 +65,8 @@ public class LevelEntity extends PanacheEntityBase {
     @Column(name = "published_at")
     public LocalDateTime publishedAt;
 
-    @Column(nullable = false)
-    public short length;
+    // Nula hasta que se sube la primera version: la longitud sale del contenido.
+    public Short length;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_version", foreignKey = @ForeignKey(name = "fk_levels_current_version"))

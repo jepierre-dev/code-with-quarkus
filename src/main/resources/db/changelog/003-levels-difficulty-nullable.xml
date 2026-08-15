@@ -1,0 +1,15 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Un nivel no tiene dificultad hasta que un moderador lo califica: publicado no implica calificado. -->
+    <changeSet author="hexarch" id="003-1-levels-difficulty-nullable">
+        <dropNotNullConstraint tableName="levels" columnName="difficulty_id" columnDataType="UUID"/>
+        <rollback>
+            <addNotNullConstraint tableName="levels" columnName="difficulty_id" columnDataType="UUID"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
