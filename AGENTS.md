@@ -10,7 +10,7 @@ Convenciones obligatorias de este repositorio. Leer antes de crear o mover cualq
 
 ## Arquitectura hexagonal — encarpetado canónico
 
-Un paquete por bounded context bajo `org.hexarch.<contexto>` (ej. `user`, `level`).
+Un paquete por bounded context bajo `org.hexarch.<contexto>` (ej. `user`, `auth`, `level`).
 **Esta estructura no se negocia ni se simplifica**, aunque una carpeta quede vacía:
 
 ```
@@ -31,10 +31,11 @@ org.hexarch.<contexto>
         │       ├── dto        # Requests/responses del borde HTTP
         │       └── ...        # Controllers/resources
         └── out
-            └── persistence
-                ├── entity     # @Entity JPA
-                ├── mapper     # entity <-> modelo de dominio
-                └── repository # Implementaciones de los puertos out
+            ├── persistence
+            │   ├── entity     # @Entity JPA
+            │   ├── mapper     # entity <-> modelo de dominio
+            │   └── repository # Implementaciones de los puertos out
+            └── <tecnologia>   # Otras familias de adaptadores driven (ej. security, http, messaging)
 ```
 
 Reglas de dependencia:
@@ -43,6 +44,18 @@ Reglas de dependencia:
 - `application` sólo conoce `domain`.
 - `infrastructure` implementa los puertos; nunca al revés.
 - Los adaptadores `in` no hablan con los adaptadores `out` directamente: siempre pasan por un puerto `in`.
+
+### Comunicación entre contextos
+
+- Un contexto sólo depende de otro a través de su **puerto `in`** y su modelo de dominio (ej. `auth` usa `UsersUseCase`).
+- Nunca se importa el puerto `out`, la entidad JPA ni el adaptador de otro contexto.
+- Sin relaciones JPA entre entidades de contextos distintos: se guarda el `UUID` y la FK la mantiene Liquibase.
+
+### Separación auth / user
+
+- `user` gestiona identidad y estado de la cuenta (`users`, `player_stats`). **No conoce contraseñas ni tokens.**
+- `auth` gestiona credenciales y sesión (`user_credential`, hashing bcrypt, emisión de JWT).
+- El registro lo orquesta `auth`: valida la contraseña, crea el usuario vía `UsersUseCase` y guarda la credencial.
 
 ### Excepción: `org.hexarch.shared`
 
@@ -67,6 +80,8 @@ org.hexarch.shared
 | Controller REST       | `XxxController`               |
 | DTO                   | `XxxDto` / `CreateXxxDto`     |
 
+`@ApiWraped` va **en el método**, no en la clase: `ApiResponseFilter` lo lee del método del recurso.
+
 ## Estilo de código
 
 - Comentarios en español, una sola línea, sólo para explicar lo que el código no puede mostrar (el porqué, no el qué). Nada de Javadoc de relleno.
@@ -78,10 +93,18 @@ org.hexarch.shared
 
 ## Errores
 
-- Todo error de negocio se lanza como `DomainException` (`RuleViolation`, `NotFound`, ...) con un `ErrorCode` propio del contexto.
+- Todo error de negocio se lanza como `DomainException` (`RuleViolation`, `NotFound`, `Conflict`) con un `ErrorCode` propio del contexto.
 - `getMessage()` devuelve el **código**; el texto legible se resuelve en el borde REST según `Accept-Language`.
 - Cada código nuevo se registra en `src/main/resources/errors.properties` (base, inglés) y `errors_es.properties`.
-- Formato del código: `<CONTEXTO>-<NNN>` (ej. `LEVEL-001`).
+- Formato del código: `<CONTEXTO>-<NNN>` (ej. `AUTH-001`, `USER-002`, `LEVEL-001`).
+- Los errores de autenticación nunca revelan si la cuenta existe.
+
+## Seguridad
+
+- Contraseñas con bcrypt (`BcryptUtil`), nunca en logs: `RawPassword` enmascara su `toString()`.
+- JWT HS256 firmado con `hexarch.jwt.secret`; el `sub` es el id del usuario, no el email.
+- El secreto de producción se inyecta con la variable de entorno `JWT_SECRET`.
+- Endpoints públicos con `@PermitAll`, el resto con `@Authenticated` o `@RolesAllowed`.
 
 ## Base de datos y Liquibase
 
