@@ -13,4 +13,9 @@ public final class AccessErrors {
         return new DomainException.Forbidden(AccessErrorCode.PERMISSION_DENIED,
                 Map.of("permission", permission.name()));
     }
+
+    // La lanza el dominio cuando una operacion necesita identidad; el borde REST ya deberia haberla exigido.
+    public static DomainException authenticationRequired() {
+        return new DomainException.Forbidden(AccessErrorCode.AUTHENTICATION_REQUIRED);
+    }
 }

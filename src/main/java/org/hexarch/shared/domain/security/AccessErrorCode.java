@@ -4,7 +4,8 @@ import org.hexarch.shared.domain.ErrorCode;
 
 public enum AccessErrorCode implements ErrorCode {
 
-    PERMISSION_DENIED("AUTHZ-001");
+    PERMISSION_DENIED("AUTHZ-001"),
+    AUTHENTICATION_REQUIRED("AUTHZ-002");
 
     private final String code;
 

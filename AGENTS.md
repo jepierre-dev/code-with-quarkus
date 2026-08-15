@@ -123,6 +123,14 @@ Dos ejes **ortogonales**. No mezclarlos ni meterlos en el mismo enum.
 
 La anotación es la **primera barrera** del adaptador `in`. Si la regla es de negocio, reafirmarla en el caso de uso a través de un puerto, para que no se escape desde otro adaptador.
 
+### Tres estados de autenticación, no dos
+
+- **Público** (`@PermitAll`), **autenticado** (`@Authenticated` / `@RequirePermission`) y **autenticación opcional**: endpoints públicos que enriquecen la respuesta si viene un token.
+- Los casos de uso reciben `shared.domain.security.Caller` como **primer parámetro**, nunca `JsonWebToken`. `Caller` nunca es null: un visitante anónimo es `Caller.ANONYMOUS`.
+- El único `if (token != null)` vive en el productor CDI del adaptador `in`. Nada de duplicar endpoints en `/me/...`.
+- Un token inválido o caducado devuelve 401 aunque el endpoint sea `@PermitAll`. Es lo correcto; no desactivar la autenticación proactiva para tragárselo.
+- Sobre recursos ajenos no visibles se devuelve **404, no 403**: un 403 confirmaría que ese id existe.
+
 ## i18n
 
 - Dos bundles: `errors.properties` (códigos de error) y `messages.properties` (mensajes de éxito), ambos con su `_es`.
