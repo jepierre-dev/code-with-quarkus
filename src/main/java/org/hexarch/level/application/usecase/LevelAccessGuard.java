@@ -1,5 +1,7 @@
 package org.hexarch.level.application.usecase;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,23 +13,34 @@ import org.hexarch.level.domain.model.LevelModel;
 import org.hexarch.shared.domain.security.Caller;
 import org.hexarch.shared.domain.security.PlatformPermission;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 /**
  * Eje de autorizacion por recurso. Vive en application porque necesita ir a BD:
  * el rol sobre un nivel no cabe en el JWT.
  */
-@ApplicationScoped
+@RequestScoped
 public class LevelAccessGuard {
 
     private final LevelMemberRepositoryPort memberRepository;
+
+    /**
+     * Una sola peticion pregunta el rol varias veces (visibilidad, canEdit, canPublish).
+     * Memoizar por peticion evita esas consultas repetidas sin arrastrar datos obsoletos:
+     * el ambito muere con la peticion, asi que expulsar a un miembro surte efecto en la siguiente.
+     */
+    private final Map<RoleKey, Optional<LevelRole>> memo = new HashMap<>();
 
     public LevelAccessGuard(LevelMemberRepositoryPort memberRepository) {
         this.memberRepository = memberRepository;
     }
 
     public Optional<LevelRole> roleOf(Caller caller, UUID levelId) {
-        return caller.isAnonymous() ? Optional.empty() : memberRepository.findRole(levelId, caller.userId());
+        if (caller.isAnonymous()) {
+            return Optional.empty();
+        }
+        return memo.computeIfAbsent(new RoleKey(levelId, caller.userId()),
+                key -> memberRepository.findRole(key.levelId(), key.userId()));
     }
 
     public boolean can(Caller caller, UUID levelId, LevelPermission permission) {
@@ -68,5 +81,8 @@ public class LevelAccessGuard {
             case DRAFT -> can(caller, level.id(), LevelPermission.VIEW_DRAFT);
             case DELETED -> false;
         };
+    }
+
+    private record RoleKey(UUID levelId, UUID userId) {
     }
 }

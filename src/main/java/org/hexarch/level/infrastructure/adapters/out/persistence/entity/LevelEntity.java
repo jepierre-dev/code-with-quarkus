@@ -15,14 +15,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -45,9 +40,8 @@ public class LevelEntity extends PanacheEntityBase {
     public UUID songId;
 
     // Nula hasta que un moderador califica el nivel: publicado no implica calificado.
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "difficulty_id", foreignKey = @ForeignKey(name = "fk_levels_difficulty_id"))
-    public DifficultyEntity difficulty;
+    @Column(name = "difficulty_id")
+    public UUID difficultyId;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
@@ -68,7 +62,6 @@ public class LevelEntity extends PanacheEntityBase {
     // Nula hasta que se sube la primera version: la longitud sale del contenido.
     public Short length;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "current_version", foreignKey = @ForeignKey(name = "fk_levels_current_version"))
-    public LevelVersionEntity currentVersion;
+    @Column(name = "current_version")
+    public UUID currentVersionId;
 }

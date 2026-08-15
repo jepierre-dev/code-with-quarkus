@@ -9,13 +9,9 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -30,9 +26,8 @@ public class LevelVersionEntity extends PanacheEntityBase {
     @Column(nullable = false, updatable = false)
     public UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "level_id", nullable = false, foreignKey = @ForeignKey(name = "fk_level_versions_level_id"))
-    public LevelEntity level;
+    @Column(name = "level_id", nullable = false)
+    public UUID levelId;
 
     @Column(name = "version_number", nullable = false)
     public int versionNumber;

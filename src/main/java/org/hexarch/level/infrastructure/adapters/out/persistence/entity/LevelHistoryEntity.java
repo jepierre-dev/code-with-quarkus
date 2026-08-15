@@ -14,13 +14,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -32,9 +28,8 @@ public class LevelHistoryEntity extends PanacheEntityBase {
     @Column(nullable = false, updatable = false)
     public UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "level_id", nullable = false, foreignKey = @ForeignKey(name = "fk_level_history_level_id"))
-    public LevelEntity level;
+    @Column(name = "level_id", nullable = false)
+    public UUID levelId;
 
     // Nulo cuando la accion la ejecuta el sistema y no un usuario.
     @Column(name = "actor_id")
@@ -48,9 +43,8 @@ public class LevelHistoryEntity extends PanacheEntityBase {
     @Column(name = "target_user_id")
     public UUID targetUserId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "version_id", foreignKey = @ForeignKey(name = "fk_level_history_version_id"))
-    public LevelVersionEntity version;
+    @Column(name = "version_id")
+    public UUID versionId;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

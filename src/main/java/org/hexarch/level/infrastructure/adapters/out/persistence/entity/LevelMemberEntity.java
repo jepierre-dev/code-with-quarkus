@@ -18,11 +18,6 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
@@ -31,11 +26,6 @@ public class LevelMemberEntity extends PanacheEntityBase {
 
     @EmbeddedId
     public LevelMemberId id = new LevelMemberId();
-
-    @MapsId("levelId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "level_id", foreignKey = @ForeignKey(name = "fk_level_members_level_id"))
-    public LevelEntity level;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
