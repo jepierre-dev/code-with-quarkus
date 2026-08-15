@@ -130,6 +130,15 @@ La anotación es la **primera barrera** del adaptador `in`. Si la regla es de ne
 - `@ApiWraped(message = "auth.login.success")` recibe una **clave**, no un literal. Si la clave no está traducida se devuelve tal cual.
 - `ApiResponseFilter` no envuelve respuestas que no sean 2xx: los errores ya vienen con su forma final de `ExceptionMappers`.
 
+## Configuración
+
+- `application.properties` guarda **valores por defecto de desarrollo**, nunca secretos reales.
+- Lo que cambia por entorno va por variable de entorno. Quarkus lee `.env` en la raíz y tiene prioridad sobre `application.properties`.
+- `.env.example` es la plantilla versionada; `.env` está en `.gitignore`. Al añadir una variable nueva hay que añadirla también al ejemplo.
+- Nombre de la variable = propiedad en MAYÚSCULAS con `_` (`hexarch.jwt.issuer` → `HEXARCH_JWT_ISSUER`).
+- `docker-compose.yml` lee el mismo `.env`, así que las credenciales de Postgres se declaran una sola vez.
+- Config específica de producción con el prefijo `%prod.` en vez de un fichero aparte.
+
 ## Base de datos y Liquibase
 
 - `src/main/resources/db/changeLog.xml` es sólo el maestro: contiene `<include>`, nunca changesets.
