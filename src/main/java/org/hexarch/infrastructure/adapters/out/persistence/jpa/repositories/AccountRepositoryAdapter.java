@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.hexarch.application.ports.out.AccountRepositoryPort;
 import org.hexarch.domain.exceptions.ErrorCode;
-import org.hexarch.domain.exceptions.ResourceNotFoundException;
+import org.hexarch.domain.exceptions.DomainException;
 import org.hexarch.domain.model.Account;
 import org.hexarch.infrastructure.adapters.out.persistence.jpa.entities.AccountEntity;
 import org.hexarch.infrastructure.adapters.out.persistence.jpa.mappers.AccountMapper;
@@ -27,7 +27,7 @@ public class AccountRepositoryAdapter implements AccountRepositoryPort {
     public Account update(Account account) {
         AccountEntity managed = AccountEntity.findById(account.id());
         if (managed == null) {
-            throw new ResourceNotFoundException(ErrorCode.ACCOUNT_NOT_FOUND, "Account not found",
+            throw new DomainException.NotFound(ErrorCode.ACCOUNT_NOT_FOUND, "Account not found",
                     Map.of("accountId", account.id()));
         }
 
