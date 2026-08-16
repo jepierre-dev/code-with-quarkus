@@ -27,6 +27,7 @@ import org.hexarch.shared.domain.Page;
 import org.hexarch.shared.domain.security.AccessErrors;
 import org.hexarch.shared.domain.security.Caller;
 import org.hexarch.shared.domain.security.PlatformPermission;
+import org.hexarch.song.application.port.in.SongsUseCase;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -39,16 +40,18 @@ public class LevelsService implements LevelsUseCase {
     private final LevelHistoryRepositoryPort historyRepository;
     private final DifficultyRepositoryPort difficultyRepository;
     private final LevelStatsPort statsPort;
+    private final SongsUseCase songsUseCase;
     private final LevelAccessGuard guard;
 
     public LevelsService(LevelRepositoryPort levelRepository, LevelMemberRepositoryPort memberRepository,
             LevelHistoryRepositoryPort historyRepository, DifficultyRepositoryPort difficultyRepository,
-            LevelStatsPort statsPort, LevelAccessGuard guard) {
+            LevelStatsPort statsPort, SongsUseCase songsUseCase, LevelAccessGuard guard) {
         this.levelRepository = levelRepository;
         this.memberRepository = memberRepository;
         this.historyRepository = historyRepository;
         this.difficultyRepository = difficultyRepository;
         this.statsPort = statsPort;
+        this.songsUseCase = songsUseCase;
         this.guard = guard;
     }
 
@@ -78,6 +81,8 @@ public class LevelsService implements LevelsUseCase {
     @Transactional
     public LevelModel create(Caller caller, String name, String description, UUID songId) {
         UUID authorId = caller.requireUserId();
+        // Se valida por el puerto in del contexto song: lanza SONG-001 si no existe.
+        songsUseCase.findById(songId);
 
         LevelModel created = levelRepository.create(LevelModel.create(name, description, songId));
         memberRepository.save(LevelMemberModel.owner(created.id(), authorId));

@@ -1,0 +1,67 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="hexarch" id="007-1-create-songs">
+        <createTable tableName="songs">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_songs" nullable="false"/>
+            </column>
+            <column name="title" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="artist" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="audio_url" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_seconds" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="songs" indexName="idx_songs_title">
+            <column name="title"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Catalogo de arranque: ids fijos, iguales en todos los entornos. -->
+    <changeSet author="hexarch" id="007-2-seed-songs">
+        <sql>
+            INSERT INTO songs (id, title, artist, audio_url, duration_seconds) VALUES
+                ('50000000-0000-4000-8000-000000000001', 'Neon Drift',      'Hexarch Audio', 'https://cdn.hexarch.org/songs/neon-drift.mp3',      92),
+                ('50000000-0000-4000-8000-000000000002', 'Pulse Reactor',   'Hexarch Audio', 'https://cdn.hexarch.org/songs/pulse-reactor.mp3',  118),
+                ('50000000-0000-4000-8000-000000000003', 'Midnight Sprint', 'Hexarch Audio', 'https://cdn.hexarch.org/songs/midnight-sprint.mp3', 74),
+                ('50000000-0000-4000-8000-000000000004', 'Voidwalker',      'Hexarch Audio', 'https://cdn.hexarch.org/songs/voidwalker.mp3',     146),
+                ('50000000-0000-4000-8000-000000000005', 'Static Bloom',    'Hexarch Audio', 'https://cdn.hexarch.org/songs/static-bloom.mp3',   101);
+        </sql>
+        <rollback>
+            <sql>DELETE FROM songs WHERE id::text LIKE '50000000-0000-4000-8000-%';</sql>
+        </rollback>
+    </changeSet>
+
+    <!-- Los niveles creados antes de existir el catalogo apuntan a ids inventados: hay que
+         reasignarlos o la FK no se puede crear. -->
+    <changeSet author="hexarch" id="007-3-repoint-orphan-levels">
+        <sql>
+            UPDATE levels
+            SET song_id = '50000000-0000-4000-8000-000000000001'
+            WHERE song_id NOT IN (SELECT id FROM songs);
+        </sql>
+    </changeSet>
+
+    <changeSet author="hexarch" id="007-4-levels-song-fk">
+        <addForeignKeyConstraint baseTableName="levels" baseColumnNames="song_id"
+            referencedTableName="songs" referencedColumnNames="id"
+            constraintName="fk_levels_song_id"/>
+        <createIndex tableName="levels" indexName="idx_levels_song_id">
+            <column name="song_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
