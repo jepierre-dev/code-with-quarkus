@@ -17,6 +17,6 @@ public interface LevelVersionRepositoryPort {
 
     Optional<byte[]> findDataById(UUID versionId);
 
-    /** Puede competir con otra subida simultanea; la unica (level_id, version_number) es la que decide. */
+    /** Solo es correcto bajo el bloqueo de la fila del nivel; si no, dos subidas leen el mismo maximo. */
     int nextVersionNumber(UUID levelId);
 }

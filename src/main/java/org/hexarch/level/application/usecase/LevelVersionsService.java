@@ -45,7 +45,9 @@ public class LevelVersionsService implements LevelVersionsUseCase {
     @Transactional
     public LevelVersionModel upload(Caller caller, UUID levelId, byte[] levelData, String changelog, short length) {
         UUID authorId = caller.requireUserId();
-        LevelModel level = requireLevel(levelId);
+        // Con bloqueo: dos subidas simultaneas al mismo nivel se serializan y no repiten version_number.
+        LevelModel level = levelRepository.findByIdForUpdate(levelId)
+                .orElseThrow(() -> LevelErrors.levelNotFound(levelId));
         guard.require(caller, levelId, LevelPermission.UPLOAD_VERSION);
 
         if (levelData == null || levelData.length == 0) {

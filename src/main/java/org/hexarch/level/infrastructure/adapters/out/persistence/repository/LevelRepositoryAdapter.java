@@ -21,6 +21,7 @@ import org.hexarch.shared.domain.Page;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.Query;
 
 @ApplicationScoped
@@ -58,6 +59,12 @@ public class LevelRepositoryAdapter implements LevelRepositoryPort {
     @Override
     public Optional<LevelModel> findById(UUID levelId) {
         LevelEntity entity = LevelEntity.findById(levelId);
+        return entity == null ? Optional.empty() : Optional.of(LevelMapper.toDomain(entity));
+    }
+
+    @Override
+    public Optional<LevelModel> findByIdForUpdate(UUID levelId) {
+        LevelEntity entity = entityManager.find(LevelEntity.class, levelId, LockModeType.PESSIMISTIC_WRITE);
         return entity == null ? Optional.empty() : Optional.of(LevelMapper.toDomain(entity));
     }
 

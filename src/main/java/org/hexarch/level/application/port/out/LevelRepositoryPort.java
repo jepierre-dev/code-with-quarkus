@@ -16,6 +16,12 @@ public interface LevelRepositoryPort {
 
     Optional<LevelModel> findById(UUID levelId);
 
+    /**
+     * Bloquea la fila del nivel hasta el fin de la transaccion. Solo para operaciones que
+     * calculan algo a partir de sus filas hijas, como el numero de la siguiente version.
+     */
+    Optional<LevelModel> findByIdForUpdate(UUID levelId);
+
     /** Devuelve resumenes, no agregados: un listado no debe cargar el nivel entero por fila. */
     Page<LevelSummary> search(LevelSearchCriteria criteria);
 
