@@ -20,6 +20,9 @@ public record LevelVersionModel(
     LocalDateTime createdAt
 ) {
 
+    /** Tope del binario de una version. Lo consumen el DTO del borde y el caso de uso. */
+    public static final int MAX_DATA_BYTES = 8 * 1024 * 1024;
+
     public LevelVersionModel {
         Objects.requireNonNull(id, "id must not be null");
         Objects.requireNonNull(levelId, "levelId must not be null");

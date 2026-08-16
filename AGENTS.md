@@ -108,6 +108,7 @@ org.hexarch.shared
 - En dev/test Quarkus genera el par RSA en memoria porque no hay clave configurada. En `%prod` hay que apuntar `smallrye.jwt.sign.key.location` y `mp.jwt.verify.publickey.location` a los ficheros PEM.
 - No usar claves simétricas: Quarkus no cablea `smallrye.jwt.verify.secretkey`, así que HS256 sólo funciona con un JWK y no compensa.
 - Endpoints públicos con `@PermitAll`, el resto con `@Authenticated` o `@RequirePermission`.
+- Todo endpoint que reciba binario declara un **tope de tamaño** en el DTO (`@Size(max = ...)`) y lo reafirma en el caso de uso. El tope de `quarkus.http.limits.max-body-size` va explícito, nunca por defecto.
 
 ## Autorización
 

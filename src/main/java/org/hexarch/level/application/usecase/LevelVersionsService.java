@@ -51,6 +51,10 @@ public class LevelVersionsService implements LevelVersionsUseCase {
         if (levelData == null || levelData.length == 0) {
             throw LevelErrors.emptyLevelData();
         }
+        // Se reafirma aqui aunque el DTO ya lo valide: otro adaptador no pasaria por esa anotacion.
+        if (levelData.length > LevelVersionModel.MAX_DATA_BYTES) {
+            throw LevelErrors.levelDataTooLarge(LevelVersionModel.MAX_DATA_BYTES);
+        }
 
         LevelVersionModel version = new LevelVersionModel(levelId, versionRepository.nextVersionNumber(levelId),
                 authorId, checksumOf(levelData), changelog);

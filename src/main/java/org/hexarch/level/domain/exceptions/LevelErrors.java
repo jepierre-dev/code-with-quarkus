@@ -67,4 +67,9 @@ public final class LevelErrors {
     public static DomainException emptyLevelData() {
         return new DomainException.RuleViolation(LevelErrorCode.EMPTY_LEVEL_DATA);
     }
+
+    public static DomainException levelDataTooLarge(int maxBytes) {
+        return new DomainException.RuleViolation(LevelErrorCode.LEVEL_DATA_TOO_LARGE,
+                Map.of("maxBytes", maxBytes));
+    }
 }

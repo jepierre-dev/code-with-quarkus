@@ -15,7 +15,8 @@ public enum LevelErrorCode implements ErrorCode {
     LEVEL_PERMISSION_DENIED("LEVEL-009"),
     MEMBER_ALREADY_EXISTS("LEVEL-010"),
     OWNER_IMMUTABLE("LEVEL-011"),
-    EMPTY_LEVEL_DATA("LEVEL-012");
+    EMPTY_LEVEL_DATA("LEVEL-012"),
+    LEVEL_DATA_TOO_LARGE("LEVEL-013");
 
     private final String code;
 
