@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hexarch · banco de pruebas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header>
+    <h1>hexarch<span>/</span>banco de pruebas</h1>
+    <div id="whoami" class="whoami">sin sesión</div>
+  </header>
+
+  <main>
+    <section class="panel" id="panel-auth">
+      <h2>1 · Sesión</h2>
+      <div class="row">
+        <input id="auth-username" placeholder="usuario" value="hexi">
+        <input id="auth-email" placeholder="email" value="hexi@hexarch.org">
+        <input id="auth-password" type="password" placeholder="contraseña" value="Passw0rd123">
+      </div>
+      <div class="row">
+        <button id="btn-register">Registrar</button>
+        <button id="btn-login" class="primary">Entrar</button>
+        <button id="btn-logout" class="ghost">Salir</button>
+      </div>
+      <p class="hint">El id de usuario sale del claim <code>sub</code> del JWT: la API no expone todavía «quién soy».</p>
+    </section>
+
+    <section class="panel" id="panel-browse">
+      <h2>2 · Descubrimiento <small>(funciona sin sesión)</small></h2>
+      <div class="row">
+        <input id="search-q" placeholder="buscar por nombre…">
+        <label class="check"><input type="checkbox" id="search-mine"> sólo los míos</label>
+        <button id="btn-search">Buscar</button>
+      </div>
+      <div id="level-list" class="list"></div>
+    </section>
+
+    <section class="panel" id="panel-create">
+      <h2>3 · Crear nivel</h2>
+      <div class="row">
+        <input id="new-name" placeholder="nombre del nivel" value="Mi primer nivel">
+        <select id="new-song"></select>
+        <button id="btn-create" class="primary">Crear borrador</button>
+      </div>
+      <input id="new-description" placeholder="descripción (opcional)">
+    </section>
+
+    <section class="panel" id="panel-editor">
+      <h2>4 · Editor</h2>
+      <div id="editor-empty" class="empty">Crea o abre un nivel para editarlo.</div>
+
+      <div id="editor-body" hidden>
+        <div class="level-head">
+          <div>
+            <strong id="editor-name">—</strong>
+            <span class="badge" id="editor-status">—</span>
+            <span class="badge alt" id="editor-difficulty" hidden></span>
+          </div>
+          <div class="stats" id="editor-stats"></div>
+        </div>
+
+        <div class="row palette">
+          <span class="label">Pincel:</span>
+          <button class="tool selected" data-tool="block">bloque</button>
+          <button class="tool" data-tool="spike">pincho</button>
+          <button class="tool" data-tool="coin">moneda</button>
+          <button class="tool" data-tool="erase">borrar</button>
+          <span class="spacer"></span>
+          <span class="label" id="editor-count">0 objetos</span>
+          <button id="btn-clear" class="ghost">Vaciar</button>
+        </div>
+
+        <div id="grid" class="grid"></div>
+
+        <div class="row">
+          <input id="save-changelog" placeholder="qué cambia esta versión">
+          <button id="btn-save" class="primary">Guardar versión</button>
+          <button id="btn-open">Abrir versión actual</button>
+        </div>
+
+        <div class="row">
+          <button id="btn-publish">Publicar</button>
+          <button id="btn-unpublish">Despublicar</button>
+          <button id="btn-like">Me gusta</button>
+          <button id="btn-play">Registrar partida</button>
+          <button id="btn-delete" class="danger">Borrar</button>
+        </div>
+
+        <div class="row" id="mod-row" hidden>
+          <span class="label">Moderación:</span>
+          <select id="mod-difficulty"></select>
+          <button id="btn-rate">Calificar</button>
+        </div>
+
+        <details class="versions">
+          <summary>Historial de versiones</summary>
+          <div id="version-list" class="list"></div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <aside class="panel log-panel">
+    <h2>Registro de llamadas</h2>
+    <div id="log" class="log"></div>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
