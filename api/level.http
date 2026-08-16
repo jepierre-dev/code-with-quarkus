@@ -31,6 +31,13 @@ Accept-Language: {{lang}}
 
 @difficultyId = {{difficulties.response.body.data.10.id}}
 
+### Canciones disponibles (publico). El songId de un nivel se valida contra este catalogo.
+# @name songs
+GET {{baseUrl}}/songs
+Accept-Language: {{lang}}
+
+@songId = {{songs.response.body.data.items.0.id}}
+
 
 # ----------------------------------------------------------------------------
 # Ciclo de vida del nivel
@@ -46,7 +53,7 @@ Authorization: Bearer {{accessToken}}
 {
   "name": "Bloodbath",
   "description": "Un clasico de Riot",
-  "songId": "11111111-1111-1111-1111-111111111111"
+  "songId": "{{songId}}"
 }
 
 @levelId = {{createLevel.response.body.data.id}}
@@ -250,6 +257,17 @@ Authorization: Bearer {{accessToken}}
 
 {
   "name": "ab",
+  "songId": "{{songId}}"
+}
+
+### SONG-001: la cancion no esta en el catalogo
+POST {{baseUrl}}/levels
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Nivel con cancion falsa",
   "songId": "11111111-1111-1111-1111-111111111111"
 }
 

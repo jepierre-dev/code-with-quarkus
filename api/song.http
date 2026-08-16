@@ -1,0 +1,56 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@lang = es
+
+# Catalogo de solo lectura: las canciones se siembran por migracion, no se crean por API.
+
+### Login (solo hace falta para la ultima peticion)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "email": "hexi@hexarch.org",
+  "password": "Passw0rd123"
+}
+
+@accessToken = {{login.response.body.data.accessToken}}
+
+### Listado completo (publico)
+# @name songs
+GET {{baseUrl}}/songs
+Accept-Language: {{lang}}
+
+@songId = {{songs.response.body.data.items.0.id}}
+
+### Buscar por titulo o artista
+GET {{baseUrl}}/songs?q=void
+Accept-Language: {{lang}}
+
+### Paginacion
+GET {{baseUrl}}/songs?page=0&size=2
+Accept-Language: {{lang}}
+
+### El size se acota a 100 aunque pidas mas
+GET {{baseUrl}}/songs?size=100000
+Accept-Language: {{lang}}
+
+### Detalle de una cancion
+GET {{baseUrl}}/songs/{{songId}}
+Accept-Language: {{lang}}
+
+### SONG-001: cancion inexistente
+GET {{baseUrl}}/songs/ffffffff-ffff-4fff-8fff-ffffffffffff
+Accept-Language: {{lang}}
+
+### SONG-001: crear un nivel con una cancion que no existe
+POST {{baseUrl}}/levels
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Nivel con cancion falsa",
+  "songId": "11111111-1111-1111-1111-111111111111"
+}
