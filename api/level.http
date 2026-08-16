@@ -1,13 +1,277 @@
 @baseUrl = http://localhost:8080
 @contentType = application/json
 @lang = es
-@accessToken =
-@levelId = 00000000-0000-0000-0000-000000000000
 
-# El contexto level solo tiene entidades por ahora.
-# Añadir aqui las peticiones al crear LevelController.
+# Ejecuta primero "Login". El resto encadena las variables solo.
+# Excepcion: @collaboratorId hay que rellenarlo a mano (ver nota al final del archivo).
+@collaboratorId = 00000000-0000-0000-0000-000000000000
 
-### Placeholder: detalle de nivel
-# GET {{baseUrl}}/levels/{{levelId}}
-# Accept: {{contentType}}
-# Authorization: Bearer {{accessToken}}
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "email": "hexi@hexarch.org",
+  "password": "Passw0rd123"
+}
+
+@accessToken = {{login.response.body.data.accessToken}}
+
+
+# ----------------------------------------------------------------------------
+# Catalogo
+# ----------------------------------------------------------------------------
+
+### Dificultades disponibles (publico)
+# @name difficulties
+GET {{baseUrl}}/difficulties
+Accept-Language: {{lang}}
+
+@difficultyId = {{difficulties.response.body.data.10.id}}
+
+
+# ----------------------------------------------------------------------------
+# Ciclo de vida del nivel
+# ----------------------------------------------------------------------------
+
+### Crear nivel (queda en DRAFT, sin dificultad y sin longitud)
+# @name createLevel
+POST {{baseUrl}}/levels
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Bloodbath",
+  "description": "Un clasico de Riot",
+  "songId": "11111111-1111-1111-1111-111111111111"
+}
+
+@levelId = {{createLevel.response.body.data.id}}
+
+### Ver el borrador como dueno: trae el bloque viewer
+GET {{baseUrl}}/levels/{{levelId}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Ver el borrador sin token -> 404, no 403 (no confirmamos que el id exista)
+GET {{baseUrl}}/levels/{{levelId}}
+Accept-Language: {{lang}}
+
+### Renombrar (requiere permiso EDIT sobre el nivel)
+PATCH {{baseUrl}}/levels/{{levelId}}
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Bloodbath Redux",
+  "description": "Version revisada"
+}
+
+### LEVEL-007: publicar sin ninguna version subida
+POST {{baseUrl}}/levels/{{levelId}}/publish
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+
+# ----------------------------------------------------------------------------
+# Versiones
+# ----------------------------------------------------------------------------
+
+### Subir version (levelData va en base64; el checksum lo calcula el servidor)
+# @name uploadVersion
+POST {{baseUrl}}/levels/{{levelId}}/versions
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "levelData": "SGVsbG8gR0QgTGV2ZWwh",
+  "changelog": "Primera version jugable",
+  "length": 90
+}
+
+### Historial de versiones (solo miembros, aunque el nivel sea publico)
+GET {{baseUrl}}/levels/{{levelId}}/versions
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Publicar (ahora si: ya hay version)
+POST {{baseUrl}}/levels/{{levelId}}/publish
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Descargar el binario de la version actual (cuenta como descarga)
+GET {{baseUrl}}/levels/{{levelId}}/versions/current
+Authorization: Bearer {{accessToken}}
+
+
+# ----------------------------------------------------------------------------
+# Descubrimiento (publico)
+# ----------------------------------------------------------------------------
+
+### Listado sin token: solo devuelve publicados
+GET {{baseUrl}}/levels
+Accept-Language: {{lang}}
+
+### Busqueda con filtros y paginacion
+GET {{baseUrl}}/levels?q=blood&page=0&size=10
+Accept-Language: {{lang}}
+
+### El size se acota a 100 aunque pidas mas
+GET {{baseUrl}}/levels?size=100000
+Accept-Language: {{lang}}
+
+### Pedir borradores sin permiso: se recorta a PUBLISHED en vez de fallar
+GET {{baseUrl}}/levels?status=DRAFT
+Accept-Language: {{lang}}
+
+### Ver el nivel ya publicado sin token: viewer viene null
+GET {{baseUrl}}/levels/{{levelId}}
+Accept-Language: {{lang}}
+
+
+# ----------------------------------------------------------------------------
+# Interaccion del jugador
+# ----------------------------------------------------------------------------
+
+### Dar like
+POST {{baseUrl}}/levels/{{levelId}}/likes
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Repetir el like: idempotente, el contador no sube
+POST {{baseUrl}}/levels/{{levelId}}/likes
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Quitar el like
+DELETE {{baseUrl}}/levels/{{levelId}}/likes
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Registrar una partida
+POST {{baseUrl}}/levels/{{levelId}}/plays
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### 401: sin identidad no se cuentan partidas
+POST {{baseUrl}}/levels/{{levelId}}/plays
+Accept-Language: {{lang}}
+
+
+# ----------------------------------------------------------------------------
+# Miembros del nivel
+# ----------------------------------------------------------------------------
+
+### Listar miembros (publico si el nivel lo es: son los creditos)
+GET {{baseUrl}}/levels/{{levelId}}/members
+Accept-Language: {{lang}}
+
+### Invitar a un colaborador
+POST {{baseUrl}}/levels/{{levelId}}/members
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "userId": "{{collaboratorId}}",
+  "role": "DECORATOR"
+}
+
+### Cambiar su rol
+PATCH {{baseUrl}}/levels/{{levelId}}/members/{{collaboratorId}}
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "role": "BUILDER"
+}
+
+### Expulsar al colaborador
+DELETE {{baseUrl}}/levels/{{levelId}}/members/{{collaboratorId}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### LEVEL-011: el dueno no puede abandonar su propio nivel
+DELETE {{baseUrl}}/levels/{{levelId}}/members/me
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+
+# ----------------------------------------------------------------------------
+# Moderacion
+# ----------------------------------------------------------------------------
+
+### Calificar el nivel: exige LEVEL_APPROVE de plataforma, no ser miembro
+PATCH {{baseUrl}}/levels/{{levelId}}/difficulty
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "difficultyId": "{{difficultyId}}"
+}
+
+### LEVEL-003: dificultad inexistente
+PATCH {{baseUrl}}/levels/{{levelId}}/difficulty
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "difficultyId": "ffffffff-ffff-4fff-8fff-ffffffffffff"
+}
+
+### Despublicar (pasa a UNLISTED; publishedAt se conserva)
+POST {{baseUrl}}/levels/{{levelId}}/unpublish
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+### Borrado logico (pasa a DELETED)
+DELETE {{baseUrl}}/levels/{{levelId}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+
+# ----------------------------------------------------------------------------
+# Errores de validacion
+# ----------------------------------------------------------------------------
+
+### REQUEST-001: nombre demasiado corto
+POST {{baseUrl}}/levels
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "ab",
+  "songId": "11111111-1111-1111-1111-111111111111"
+}
+
+### LEVEL-001: nivel inexistente
+GET {{baseUrl}}/levels/ffffffff-ffff-4fff-8fff-ffffffffffff
+Accept-Language: {{lang}}
+
+### LEVEL-012: version sin datos
+POST {{baseUrl}}/levels/{{levelId}}/versions
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "levelData": "",
+  "length": 10
+}
+
+
+# ----------------------------------------------------------------------------
+# Nota sobre @collaboratorId
+# ----------------------------------------------------------------------------
+# La API no expone todavia "quien soy": /auth/register solo devuelve el token,
+# asi que el id de otro usuario hay que sacarlo del claim "sub" de su JWT
+# (pegalo en jwt.io) o consultarlo en la base de datos.
