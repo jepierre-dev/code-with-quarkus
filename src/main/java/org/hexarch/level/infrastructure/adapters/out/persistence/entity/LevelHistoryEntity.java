@@ -14,8 +14,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -23,8 +21,8 @@ import jakarta.persistence.Table;
 @Table(name = "level_history")
 public class LevelHistoryEntity extends PanacheEntityBase {
 
+    // Sin @GeneratedValue: el id lo genera el dominio.
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
     public UUID id;
 

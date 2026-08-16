@@ -15,8 +15,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -24,8 +22,8 @@ import jakarta.persistence.Table;
 @Table(name = "levels")
 public class LevelEntity extends PanacheEntityBase {
 
+    // Sin @GeneratedValue: el id lo genera el dominio, y Hibernate tomaria por detached una entidad con id puesto.
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
     public UUID id;
 

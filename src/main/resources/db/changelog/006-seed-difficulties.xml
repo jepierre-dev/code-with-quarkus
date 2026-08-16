@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Catalogo con ids fijos: deben ser los mismos en todos los entornos para poder referenciarlos. -->
+    <changeSet author="hexarch" id="006-1-seed-difficulties">
+        <sql>
+            INSERT INTO difficulties (id, name, stars, icon) VALUES
+                ('a0000000-0000-4000-8000-000000000001', 'Auto',           1,  'difficulty_auto'),
+                ('a0000000-0000-4000-8000-000000000002', 'Easy',           2,  'difficulty_easy'),
+                ('a0000000-0000-4000-8000-000000000003', 'Normal',         3,  'difficulty_normal'),
+                ('a0000000-0000-4000-8000-000000000004', 'Hard',           5,  'difficulty_hard'),
+                ('a0000000-0000-4000-8000-000000000005', 'Harder',         7,  'difficulty_harder'),
+                ('a0000000-0000-4000-8000-000000000006', 'Insane',         9,  'difficulty_insane'),
+                ('a0000000-0000-4000-8000-000000000007', 'Easy Demon',     10, 'difficulty_demon_easy'),
+                ('a0000000-0000-4000-8000-000000000008', 'Medium Demon',   10, 'difficulty_demon_medium'),
+                ('a0000000-0000-4000-8000-000000000009', 'Hard Demon',     10, 'difficulty_demon_hard'),
+                ('a0000000-0000-4000-8000-00000000000a', 'Insane Demon',   10, 'difficulty_demon_insane'),
+                ('a0000000-0000-4000-8000-00000000000b', 'Extreme Demon',  10, 'difficulty_demon_extreme');
+        </sql>
+        <rollback>
+            <sql>DELETE FROM difficulties WHERE id::text LIKE 'a0000000-0000-4000-8000-%';</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

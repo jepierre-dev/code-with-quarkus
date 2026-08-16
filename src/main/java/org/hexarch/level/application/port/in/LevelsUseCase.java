@@ -1,7 +1,9 @@
 package org.hexarch.level.application.port.in;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.hexarch.level.domain.model.DifficultyModel;
 import org.hexarch.level.domain.model.LevelDetail;
 import org.hexarch.level.domain.model.LevelModel;
 import org.hexarch.level.domain.model.LevelSearchCriteria;
@@ -11,6 +13,9 @@ import org.hexarch.shared.domain.security.Caller;
 
 /** Ciclo de vida del nivel. Caller nunca es null: los dos primeros metodos admiten anonimo. */
 public interface LevelsUseCase {
+
+    /** Catalogo publico: no varia por usuario, asi que no necesita Caller. */
+    List<DifficultyModel> difficulties();
 
     Page<LevelSummary> search(Caller caller, LevelSearchCriteria criteria);
 

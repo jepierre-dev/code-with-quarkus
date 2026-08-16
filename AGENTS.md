@@ -82,13 +82,15 @@ org.hexarch.shared
 
 `@ApiWraped` va **en el método**, no en la clase: `ApiResponseFilter` lo lee del método del recurso.
 
+`@Consumes` va **en el método**, no en la clase. Puesto en la clase también filtra el *matching* de la petición, así que un `POST` o `PATCH` sin cuerpo (`/publish`, `/ban`) responde **415** si el cliente no manda `Content-Type`.
+
 ## Estilo de código
 
 - Comentarios en español, una sola línea, sólo para explicar lo que el código no puede mostrar (el porqué, no el qué). Nada de Javadoc de relleno.
 - Nada de Lombok. Records para el dominio y los DTOs.
 - Entidades JPA: `extends PanacheEntityBase` con **campos públicos** (estilo Panache), sin getters/setters.
 - Imports explícitos, sin comodines. Orden: `java.*`, terceros (`org.*`), `io.quarkus.*`, `jakarta.*`.
-- IDs: `UUID` con `@GeneratedValue(strategy = GenerationType.UUID)`.
+- IDs `UUID`. Si el **dominio** genera el id (`UUID.randomUUID()` en la factoría del modelo), la entidad va **sin `@GeneratedValue`**: con generador, Hibernate ve un id ya puesto y lanza `Detached entity passed to persist`. Sólo lleva `@GeneratedValue(strategy = GenerationType.UUID)` si el modelo llega con `id == null`.
 - Relaciones: `@ManyToOne(fetch = FetchType.LAZY)` siempre; nombrar las FK con `@ForeignKey(name = "fk_<tabla>_<columna>")`.
 
 ## Errores
@@ -157,6 +159,8 @@ La anotación es la **primera barrera** del adaptador `in`. Si la regla es de ne
 - Nombres SQL en `snake_case`; tablas en plural.
 - Enums nativos de PostgreSQL: las etiquetas van en **MAYÚSCULA** porque Hibernate mapea por el nombre de la constante Java. En la entidad se usa `@Enumerated(EnumType.STRING)` + `@JdbcTypeCode(SqlTypes.NAMED_ENUM)` + `columnDefinition = "<tipo_pg>"`.
 - `byte[]` sin `@Lob` y con `columnDefinition = "bytea"` (con `@Lob` PostgreSQL lo mapearía a OID).
+- En consultas nativas, una columna `timestamp` llega como `LocalDateTime`, no como `java.sql.Timestamp`.
+- El WHERE dinámico se arma con **fragmentos fijos** y valores **siempre enlazados**; nunca se concatena nada que venga de la petición.
 - El dump de referencia del esquema está en `db/sql-dump.hexi-dash.sql` (fuera de `src/`).
 
 ## Reglas de trabajo

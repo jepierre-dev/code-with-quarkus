@@ -1,6 +1,7 @@
 package org.hexarch.level.application.usecase;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.hexarch.level.application.port.in.LevelsUseCase;
@@ -52,10 +53,14 @@ public class LevelsService implements LevelsUseCase {
     }
 
     @Override
+    public List<DifficultyModel> difficulties() {
+        return difficultyRepository.findAll();
+    }
+
+    @Override
     public Page<LevelSummary> search(Caller caller, LevelSearchCriteria criteria) {
         return levelRepository.search(visibleCriteria(caller, criteria));
     }
-
     @Override
     public LevelDetail view(Caller caller, UUID levelId) {
         LevelModel level = requireLevel(levelId);

@@ -20,8 +20,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+// @Consumes va por metodo: los PATCH sin cuerpo fallarian con 415 si estuviera en la clase.
 @Path("/users")
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UsersController {
 
@@ -57,6 +57,7 @@ public class UsersController {
 
     @PATCH
     @Path("/{userId}/role")
+    @Consumes(MediaType.APPLICATION_JSON)
     @RequirePermission(PlatformPermission.USER_ROLE_ASSIGN)
     @ApiWraped(message = "user.role.success")
     public UserDto changeRole(@PathParam("userId") UUID userId, @Valid ChangeRoleDto request) {

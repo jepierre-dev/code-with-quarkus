@@ -9,8 +9,6 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -21,8 +19,8 @@ import jakarta.persistence.UniqueConstraint;
                 "version_number" }) })
 public class LevelVersionEntity extends PanacheEntityBase {
 
+    // Sin @GeneratedValue: el id lo genera el dominio.
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false, updatable = false)
     public UUID id;
 

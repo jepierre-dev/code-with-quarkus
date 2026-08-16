@@ -1,6 +1,7 @@
 package org.hexarch.level.infrastructure.adapters.out.persistence.repository;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -131,7 +132,6 @@ public class LevelRepositoryAdapter implements LevelRepositoryPort {
     }
 
     private static LevelSummary toSummary(Object[] row) {
-        Timestamp publishedAt = (Timestamp) row[7];
         return new LevelSummary(
                 (UUID) row[0],
                 (String) row[1],
@@ -140,6 +140,14 @@ public class LevelRepositoryAdapter implements LevelRepositoryPort {
                 row[4] == null ? null : ((Number) row[4]).shortValue(),
                 ((Number) row[5]).longValue(),
                 ((Number) row[6]).longValue(),
-                publishedAt == null ? null : publishedAt.toLocalDateTime());
+                toLocalDateTime(row[7]));
+    }
+
+    // El driver devuelve LocalDateTime, pero Timestamp sigue siendo valido segun la version.
+    private static LocalDateTime toLocalDateTime(Object value) {
+        if (value instanceof Timestamp timestamp) {
+            return timestamp.toLocalDateTime();
+        }
+        return (LocalDateTime) value;
     }
 }

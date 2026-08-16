@@ -9,5 +9,6 @@
     <include file="db/changelog/003-levels-difficulty-nullable.xml"/>
     <include file="db/changelog/004-level-stats.xml"/>
     <include file="db/changelog/005-levels-length-nullable.xml"/>
+    <include file="db/changelog/006-seed-difficulties.xml"/>
 
 </databaseChangeLog>
