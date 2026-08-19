@@ -1,5 +1,6 @@
 package org.hexarch.account.infrastructure.adapters.out.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,5 +51,13 @@ public class AccountRepositoryAdapter implements AccountRepositoryPort {
     @Override
     public boolean existsByEmail(String email) {
         return AccountEntity.count("email", email) > 0;
+    }
+
+    @Override
+    public List<Account> listAccounts() {
+        List<AccountEntity> entities = AccountEntity.listAll();
+        return entities.stream()
+                .map(AccountMapper::toDomain)
+                .toList();
     }
 }

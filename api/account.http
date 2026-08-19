@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:8080
 @contentType = application/json
-@lang = es
+@lang = en
 
 ### Crear cuenta origen
 # @name source
@@ -61,6 +61,13 @@ Accept-Language: en
   "toAccountId": "{{targetId}}",
   "amount": 1.00
 }
+
+
+### Listar cuentas
+GET {{baseUrl}}/operations/accounts
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
 
 ### ACCOUNT-005: titular duplicado -> 409
 POST {{baseUrl}}/operations/create-account

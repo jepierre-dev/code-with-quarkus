@@ -1,6 +1,7 @@
 package org.hexarch.account.application.usecase;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,5 +56,10 @@ public class AccountOperationService implements AccountOperationUseCase {
 
         accountRepositoryPort.update(updatedFromAccount);
         accountRepositoryPort.update(updatedToAccount);
+    }
+
+    @Override
+    public List<Account> listAccounts() {
+        return this.accountRepositoryPort.listAccounts();
     }
 }

@@ -1,7 +1,10 @@
 package org.hexarch.account.infrastructure.adapters.in.rest;
 
+import java.util.List;
+
 import org.hexarch.account.application.port.in.AccountOperationUseCase;
 import org.hexarch.account.infrastructure.adapters.in.rest.dto.AccountDto;
+import org.hexarch.account.infrastructure.adapters.in.rest.dto.AccountSummaryDto;
 import org.hexarch.account.infrastructure.adapters.in.rest.dto.CreateAccountDto;
 import org.hexarch.account.infrastructure.adapters.in.rest.dto.TransferDto;
 import org.hexarch.shared.infrastructure.rest.ApiWraped;
@@ -10,6 +13,7 @@ import org.jboss.resteasy.reactive.ResponseStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -43,5 +47,16 @@ public class OperationsController {
             @Valid @NotNull(message = "Request body must not be empty") CreateAccountDto createAccountRequest) {
         return AccountDto.from(accountOperationUseCase.createAccount(createAccountRequest.holderName(),
                 createAccountRequest.initialBalance(), createAccountRequest.email()));
+    }
+
+
+    // Endpoint de prueba, yo sé que en un mundo bancario uno no deberia
+    // cuentas asi tan olimpicamente JAJA
+
+    @GET
+    @Path("/accounts")
+    @ApiWraped(message = "account.list.success")
+    public List<AccountSummaryDto> listAccounts() {
+        return accountOperationUseCase.listAccounts().stream().map(AccountSummaryDto::from).toList();
     }
 }

@@ -1,6 +1,7 @@
 package org.hexarch.account.application.port.in;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,4 +14,6 @@ public interface AccountOperationUseCase {
     Optional<Account> getAccount(UUID accountId);
 
     void transfer(UUID fromAccountId, UUID toAccountId, BigDecimal amount);
+
+    List<Account> listAccounts();
 }
