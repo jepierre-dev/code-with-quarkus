@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.hexarch.account.domain.Account;
+import org.hexarch.account.domain.model.Account;
 
 public interface AccountOperationUseCase {
 

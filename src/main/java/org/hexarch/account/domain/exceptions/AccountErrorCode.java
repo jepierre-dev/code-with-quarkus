@@ -1,4 +1,4 @@
-package org.hexarch.account.domain;
+package org.hexarch.account.domain.exceptions;
 
 import org.hexarch.shared.domain.ErrorCode;
 

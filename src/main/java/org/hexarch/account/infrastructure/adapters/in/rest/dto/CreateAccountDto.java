@@ -1,4 +1,4 @@
-package org.hexarch.account.infrastructure.rest.dto;
+package org.hexarch.account.infrastructure.adapters.in.rest.dto;
 
 import java.math.BigDecimal;
 

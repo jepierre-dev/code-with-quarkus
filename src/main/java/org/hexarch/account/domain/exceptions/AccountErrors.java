@@ -1,4 +1,4 @@
-package org.hexarch.account.domain;
+package org.hexarch.account.domain.exceptions;
 
 import java.math.BigDecimal;
 import java.util.Map;

@@ -1,6 +1,7 @@
-package org.hexarch.account.infrastructure.persistence;
+package org.hexarch.account.infrastructure.adapters.out.persistence.mapper;
 
-import org.hexarch.account.domain.Account;
+import org.hexarch.account.domain.model.Account;
+import org.hexarch.account.infrastructure.adapters.out.persistence.entity.AccountEntity;
 
 public class AccountMapper {
 

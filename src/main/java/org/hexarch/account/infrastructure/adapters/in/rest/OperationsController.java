@@ -1,10 +1,10 @@
-package org.hexarch.account.infrastructure.rest;
+package org.hexarch.account.infrastructure.adapters.in.rest;
 
 import java.util.UUID;
 
 import org.hexarch.account.application.port.in.AccountOperationUseCase;
-import org.hexarch.account.infrastructure.rest.dto.CreateAccountDto;
-import org.hexarch.account.infrastructure.rest.dto.TransferDto;
+import org.hexarch.account.infrastructure.adapters.in.rest.dto.CreateAccountDto;
+import org.hexarch.account.infrastructure.adapters.in.rest.dto.TransferDto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

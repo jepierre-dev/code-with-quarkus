@@ -1,8 +1,10 @@
-package org.hexarch.account.domain;
+package org.hexarch.account.domain.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
+
+import org.hexarch.account.domain.exceptions.AccountErrors;
 
 public record Account(UUID id, String holderName, BigDecimal balance, String email) {
 

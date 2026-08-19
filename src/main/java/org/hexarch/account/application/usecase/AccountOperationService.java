@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import org.hexarch.account.application.port.in.AccountOperationUseCase;
 import org.hexarch.account.application.port.out.AccountRepositoryPort;
-import org.hexarch.account.domain.Account;
-import org.hexarch.account.domain.AccountErrors;
+import org.hexarch.account.domain.model.Account;
+import org.hexarch.account.domain.exceptions.AccountErrors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;

@@ -1,11 +1,13 @@
-package org.hexarch.account.infrastructure.persistence;
+package org.hexarch.account.infrastructure.adapters.out.persistence.repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import org.hexarch.account.application.port.out.AccountRepositoryPort;
-import org.hexarch.account.domain.Account;
-import org.hexarch.account.domain.AccountErrors;
+import org.hexarch.account.domain.exceptions.AccountErrors;
+import org.hexarch.account.domain.model.Account;
+import org.hexarch.account.infrastructure.adapters.out.persistence.entity.AccountEntity;
+import org.hexarch.account.infrastructure.adapters.out.persistence.mapper.AccountMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 

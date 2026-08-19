@@ -1,4 +1,4 @@
-package org.hexarch.account.infrastructure.persistence;
+package org.hexarch.account.infrastructure.adapters.out.persistence.entity;
 
 import java.math.BigDecimal;
 import java.util.UUID;
