@@ -1,0 +1,159 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@lang = es
+
+### Crear cuenta origen
+# @name source
+POST {{baseUrl}}/operations/create-account
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "holderName": "Ana Torres",
+  "initialBalance": 500.00,
+  "email": "ana.torres@hexarch.org"
+}
+
+@sourceId = {{source.response.body.data.id}}
+
+### Crear cuenta destino
+# @name target
+POST {{baseUrl}}/operations/create-account
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "holderName": "Beto Ruiz",
+  "initialBalance": 0.00,
+  "email": "beto.ruiz@hexarch.org"
+}
+
+@targetId = {{target.response.body.data.id}}
+
+### El email es opcional
+POST {{baseUrl}}/operations/create-account
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "holderName": "Cuenta sin correo",
+  "initialBalance": 10.00
+}
+
+### Transferencia correcta
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "fromAccountId": "{{sourceId}}",
+  "toAccountId": "{{targetId}}",
+  "amount": 120.50
+}
+
+### El mismo caso en ingles: cambia message y Content-Language
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: en
+
+{
+  "fromAccountId": "{{sourceId}}",
+  "toAccountId": "{{targetId}}",
+  "amount": 1.00
+}
+
+### ACCOUNT-005: titular duplicado -> 409
+POST {{baseUrl}}/operations/create-account
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "holderName": "Ana Torres",
+  "initialBalance": 50.00,
+  "email": "otro.correo@hexarch.org"
+}
+
+### ACCOUNT-006: email duplicado -> 409
+POST {{baseUrl}}/operations/create-account
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "holderName": "Otro Titular",
+  "initialBalance": 50.00,
+  "email": "ana.torres@hexarch.org"
+}
+
+### ACCOUNT-004: cuenta origen inexistente -> 404
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "fromAccountId": "ffffffff-ffff-4fff-8fff-ffffffffffff",
+  "toAccountId": "{{targetId}}",
+  "amount": 10.00
+}
+
+### ACCOUNT-002: saldo insuficiente -> 422
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "fromAccountId": "{{sourceId}}",
+  "toAccountId": "{{targetId}}",
+  "amount": 999999.00
+}
+
+### ACCOUNT-001: monto no positivo -> 422
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "fromAccountId": "{{sourceId}}",
+  "toAccountId": "{{targetId}}",
+  "amount": 0
+}
+
+### REQUEST-001: validacion del cuerpo -> 400
+POST {{baseUrl}}/operations/create-account
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "holderName": "",
+  "email": "no-es-un-email"
+}
+
+### REQUEST-001: campos obligatorios ausentes en la transferencia -> 400
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "amount": 10.00
+}
+
+### REQUEST-002: tipo incompatible, amount como texto -> 400
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "fromAccountId": "{{sourceId}}",
+  "toAccountId": "{{targetId}}",
+  "amount": "mucho dinero"
+}
+
+### REQUEST-002: UUID malformado -> 400
+POST {{baseUrl}}/operations/transfer
+Content-Type: {{contentType}}
+Accept-Language: {{lang}}
+
+{
+  "fromAccountId": "no-soy-un-uuid",
+  "toAccountId": "{{targetId}}",
+  "amount": 10.00
+}
