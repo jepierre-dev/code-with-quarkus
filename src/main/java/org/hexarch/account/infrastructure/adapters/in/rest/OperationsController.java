@@ -1,10 +1,11 @@
 package org.hexarch.account.infrastructure.adapters.in.rest;
 
-import java.util.UUID;
-
 import org.hexarch.account.application.port.in.AccountOperationUseCase;
+import org.hexarch.account.infrastructure.adapters.in.rest.dto.AccountDto;
 import org.hexarch.account.infrastructure.adapters.in.rest.dto.CreateAccountDto;
 import org.hexarch.account.infrastructure.adapters.in.rest.dto.TransferDto;
+import org.hexarch.shared.infrastructure.rest.ApiWraped;
+import org.jboss.resteasy.reactive.ResponseStatus;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -27,19 +28,20 @@ public class OperationsController {
 
     @POST
     @Path("/transfer")
-    public String transfer(@Valid @NotNull(message = "Request body must not be empty") TransferDto transferRequest) {
-        UUID fromAccountId = transferRequest.fromAccountId();
-        UUID toAccountId = transferRequest.toAccountId();
-        accountOperationUseCase.transfer(fromAccountId, toAccountId, transferRequest.amount());
-        return "Transfer operation executed successfully.";
+    @ResponseStatus(200)
+    @ApiWraped(message = "account.transfer.success")
+    public void transfer(@Valid @NotNull(message = "Request body must not be empty") TransferDto transferRequest) {
+        accountOperationUseCase.transfer(transferRequest.fromAccountId(), transferRequest.toAccountId(),
+                transferRequest.amount());
     }
 
     @POST
     @Path("/create-account")
-    public String createAccount(
+    @ResponseStatus(201)
+    @ApiWraped(message = "account.created")
+    public AccountDto createAccount(
             @Valid @NotNull(message = "Request body must not be empty") CreateAccountDto createAccountRequest) {
-        accountOperationUseCase.createAccount(createAccountRequest.holderName(),
-                createAccountRequest.initialBalance(), createAccountRequest.email());
-        return "Account created successfully.";
+        return AccountDto.from(accountOperationUseCase.createAccount(createAccountRequest.holderName(),
+                createAccountRequest.initialBalance(), createAccountRequest.email()));
     }
 }

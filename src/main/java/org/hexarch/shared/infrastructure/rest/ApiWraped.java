@@ -12,7 +12,8 @@ import jakarta.ws.rs.NameBinding;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface ApiWraped {
 
-    String message() default "API response wrapped successfully.";
+    /** Clave del bundle messages; si no hay traduccion se devuelve la clave tal cual. */
+    String message() default "response.success";
 
     boolean includeStatus() default true;
 
